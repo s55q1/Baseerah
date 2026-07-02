@@ -39,15 +39,7 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
         }}>
           {/* شعار */}
           <Link href={authed ? '/dashboard' : '/login'} style={{ display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none' }}>
-            <div style={{
-              background: 'linear-gradient(135deg, #1a56db, #0A3D91)',
-              borderRadius: '12px', padding: '8px',
-              boxShadow: '0 2px 12px rgba(10,61,145,0.25)',
-            }}>
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/>
-              </svg>
-            </div>
+            <img src="/mascot.png" alt="بصيرة" style={{ width: '36px', height: '36px', objectFit: 'contain' }} />
             <div>
               <p style={{ fontSize: '16px', fontWeight: 800, color: '#0f172a', lineHeight: 1 }}>بصيرة</p>
               <p style={{ fontSize: '10px', color: '#64748b', marginTop: '2px' }}>ذكاء السيولة</p>

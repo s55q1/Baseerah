@@ -65,15 +65,7 @@ export default function LoginPage() {
 
         {/* شعار */}
         <div className="relative z-10 flex items-center gap-3">
-          <div style={{
-            background: 'linear-gradient(135deg, #1a56db, #0A3D91)',
-            borderRadius: '14px', padding: '10px',
-            boxShadow: '0 4px 20px rgba(26,86,219,0.45)',
-          }}>
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/>
-            </svg>
-          </div>
+          <img src="/mascot.png" alt="بصيرة" style={{ width: '48px', height: '48px', objectFit: 'contain' }} />
           <div>
             <p style={{ color: '#fff', fontSize: '22px', fontWeight: 800, letterSpacing: '-0.3px' }}>بصيرة</p>
             <p style={{ color: '#5b8dee', fontSize: '11px', marginTop: '1px' }}>ذكاء السيولة للأعمال</p>
@@ -156,11 +148,7 @@ export default function LoginPage() {
 
           {/* شعار للجوال */}
           <div className="lg:hidden mb-8 flex items-center gap-3">
-            <div style={{ background: '#0A3D91', borderRadius: '12px', padding: '8px' }}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/>
-              </svg>
-            </div>
+            <img src="/mascot.png" alt="بصيرة" style={{ width: '40px', height: '40px', objectFit: 'contain' }} />
             <p style={{ fontSize: '20px', fontWeight: 800, color: '#0f172a' }}>بصيرة</p>
           </div>
 
