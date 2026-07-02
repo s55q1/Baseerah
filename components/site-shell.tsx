@@ -1,44 +1,70 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { ArrowRight, ShieldCheck, Sparkles } from 'lucide-react';
+import { usePathname, useRouter } from 'next/navigation';
+import { mockLogout } from '@/lib/mock-auth';
 
 const links = [
-  { href: '/', label: 'الرئيسية' },
   { href: '/dashboard', label: 'لوحة التحكم' },
   { href: '/analytics', label: 'التحليلات' },
   { href: '/reports', label: 'التقارير' },
   { href: '/admin', label: 'الإدارة' },
-  { href: '/signup', label: 'تسجيل' },
-  { href: '/login', label: 'دخول' },
 ];
 
 export function SiteShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
+
+  const handleLogout = () => {
+    mockLogout();
+    router.replace('/login');
+  };
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900">
-      <header className="sticky top-0 z-30 border-b border-slate-200/80 bg-white/80 backdrop-blur">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
-          <Link href="/" className="flex items-center gap-3">
-            <div className="rounded-2xl bg-brand-700 p-2.5 text-white">
-              <Sparkles size={18} />
+    <div style={{ minHeight: '100vh', background: '#f8fafc', color: '#0f172a' }}>
+      {/* ===== Navbar ===== */}
+      <header style={{
+        position: 'sticky', top: 0, zIndex: 30,
+        borderBottom: '1px solid rgba(226,232,240,0.8)',
+        background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(12px)',
+      }}>
+        <div style={{
+          maxWidth: '1280px', margin: '0 auto',
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          padding: '0 32px', height: '64px',
+        }}>
+          {/* شعار */}
+          <Link href="/dashboard" style={{ display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none' }}>
+            <div style={{
+              background: 'linear-gradient(135deg, #1a56db, #0A3D91)',
+              borderRadius: '12px', padding: '8px',
+              boxShadow: '0 2px 12px rgba(10,61,145,0.25)',
+            }}>
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/>
+              </svg>
             </div>
             <div>
-              <p className="text-lg font-semibold tracking-tight">بصيرة</p>
-              <p className="text-sm text-slate-500">ذكاء السيولة للأعمال</p>
+              <p style={{ fontSize: '16px', fontWeight: 800, color: '#0f172a', lineHeight: 1 }}>بصيرة</p>
+              <p style={{ fontSize: '10px', color: '#64748b', marginTop: '2px' }}>ذكاء السيولة</p>
             </div>
           </Link>
 
-          <nav className="hidden items-center gap-6 md:flex">
+          {/* روابط */}
+          <nav style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
             {links.map((link) => {
               const active = pathname === link.href;
               return (
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`text-sm font-medium transition ${active ? 'text-brand-700' : 'text-slate-600 hover:text-brand-700'}`}
+                  style={{
+                    fontSize: '13px', fontWeight: active ? 700 : 500,
+                    color: active ? '#0A3D91' : '#64748b',
+                    padding: '6px 14px', borderRadius: '10px',
+                    background: active ? '#eff6ff' : 'transparent',
+                    textDecoration: 'none', transition: 'all 0.15s',
+                  }}
                 >
                   {link.label}
                 </Link>
@@ -46,26 +72,57 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
             })}
           </nav>
 
-          <Link href="/login" className="inline-flex items-center gap-2 rounded-full bg-brand-700 px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-900">
-            ابدأ الآن <ArrowRight size={16} />
-          </Link>
+          {/* زر تسجيل الخروج */}
+          <button
+            onClick={handleLogout}
+            style={{
+              display: 'flex', alignItems: 'center', gap: '6px',
+              padding: '8px 18px', borderRadius: '12px',
+              border: '1.5px solid #e2e8f0', background: 'white',
+              fontSize: '13px', fontWeight: 600, color: '#475569',
+              cursor: 'pointer', transition: 'all 0.15s',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = '#0A3D91';
+              e.currentTarget.style.color = '#0A3D91';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = '#e2e8f0';
+              e.currentTarget.style.color = '#475569';
+            }}
+          >
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+              <polyline points="16 17 21 12 16 7"/>
+              <line x1="21" y1="12" x2="9" y2="12"/>
+            </svg>
+            خروج
+          </button>
         </div>
       </header>
 
       <main>{children}</main>
 
-      <footer className="border-t border-slate-200/80 bg-white/70 px-4 py-8 sm:px-6 lg:px-8">
-        <div className="mx-auto flex max-w-7xl flex-col gap-4 rounded-[24px] border border-slate-200 bg-slate-50 p-6 md:flex-row md:items-center md:justify-between">
-          <div className="flex items-center gap-3">
-            <div className="rounded-2xl bg-brand-700 p-2 text-white">
-              <ShieldCheck size={18} />
+      {/* Footer */}
+      <footer style={{
+        borderTop: '1px solid #e2e8f0', background: 'white',
+        padding: '20px 32px',
+      }}>
+        <div style={{
+          maxWidth: '1280px', margin: '0 auto',
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div style={{ background: '#0A3D91', borderRadius: '8px', padding: '6px' }}>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              </svg>
             </div>
-            <div>
-              <p className="font-semibold">مُصمم للشركات الصغيرة والمتوسطة الطموحة</p>
-              <p className="text-sm text-slate-600">مراقبة السيولة بالذكاء الاصطناعي وتوجيهات تمويل ذكية.</p>
-            </div>
+            <p style={{ fontSize: '12px', color: '#64748b', fontWeight: 500 }}>
+              مُصمم للشركات الصغيرة والمتوسطة · هاكاثون أمد 2026
+            </p>
           </div>
-          <p className="text-sm text-slate-500">بصيرة © 2026 · نموذج قابل للعروض والهاكاثون</p>
+          <p style={{ fontSize: '12px', color: '#94a3b8' }}>بصيرة © 2026</p>
         </div>
       </footer>
     </div>
