@@ -11,6 +11,7 @@ import {
   YAxis,
 } from 'recharts';
 import { SiteShell } from '@/components/site-shell';
+import { AuthGuard } from '@/components/auth-guard';
 
 const trend = [
   { month: 'يناير', cash: 180000, risk: 54 },
@@ -26,8 +27,6 @@ const insights = [
   'تستهلك الرواتب 43% من التدفقات الخارجة أسبوعيا',
   'يبدأ المخزون في الضغط على السيولة منذ منتصف يوليو',
 ];
-
-import { AuthGuard } from '@/components/auth-guard';
 
 export default function AnalyticsPage() {
   return (

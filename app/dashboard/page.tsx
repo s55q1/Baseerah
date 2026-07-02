@@ -21,6 +21,7 @@ import {
   YAxis,
 } from 'recharts';
 import { SiteShell } from '@/components/site-shell';
+import { AuthGuard } from '@/components/auth-guard';
 
 const forecastData = [
   { month: 'أبريل', cash: 120000, runway: 190 },
