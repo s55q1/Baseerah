@@ -50,8 +50,6 @@ const financeOptions = [
   { name: 'تمويل الفواتير', term: '3 أيام', rate: '2.1%' },
 ];
 
-import { AuthGuard } from '@/components/auth-guard';
-
 export default function DashboardPage() {
   return (
     <AuthGuard>

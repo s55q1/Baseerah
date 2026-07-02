@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { FileText, LineChart, ShieldCheck, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import { SiteShell } from '@/components/site-shell';

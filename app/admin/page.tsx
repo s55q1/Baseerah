@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { Activity, Users, Wallet2 } from 'lucide-react';
 import { SiteShell } from '@/components/site-shell';
 
