@@ -10,6 +10,7 @@ const navLinks = [
   { href: '/reports',   label: 'التقارير'   },
   { href: '/admin',     label: 'الإدارة'    },
   { href: '/about',     label: 'عن بصيرة'   },
+  { href: '/setup',     label: '✏️ بياناتي'  },
 ];
 
 const publicPaths = ['/', '/login', '/signup'];
@@ -53,16 +54,18 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
             <nav style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
               {navLinks.map((link) => {
                 const active = pathname === link.href;
+                const isSetup = link.href === '/setup';
                 return (
                   <Link
                     key={link.href}
                     href={link.href}
                     style={{
                       fontSize: '13px', fontWeight: active ? 700 : 500,
-                      color: active ? '#0A3D91' : '#64748b',
+                      color: isSetup ? '#0A3D91' : active ? '#0A3D91' : '#64748b',
                       padding: '6px 14px', borderRadius: '10px',
-                      background: active ? '#eff6ff' : 'transparent',
+                      background: isSetup ? '#dbeafe' : active ? '#eff6ff' : 'transparent',
                       textDecoration: 'none', transition: 'all 0.15s',
+                      border: isSetup ? '1px solid #bfdbfe' : 'none',
                     }}
                   >
                     {link.label}

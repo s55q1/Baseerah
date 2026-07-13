@@ -41,19 +41,20 @@ const SLIDES = [
 
 const STORAGE_KEY = 'baseerah_onboarded';
 
-export function Onboarding() {
+export function Onboarding({ forceShow = false }: { forceShow?: boolean }) {
   const [visible, setVisible] = useState(false);
   const [slide, setSlide]     = useState(0);
 
   useEffect(() => {
-    if (!localStorage.getItem(STORAGE_KEY)) {
+    if (forceShow || !localStorage.getItem(STORAGE_KEY)) {
       setVisible(true);
     }
-  }, []);
+  }, [forceShow]);
 
   const dismiss = () => {
     localStorage.setItem(STORAGE_KEY, '1');
     setVisible(false);
+    setSlide(0);
   };
 
   if (!visible) return null;

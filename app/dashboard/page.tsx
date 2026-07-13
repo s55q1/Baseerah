@@ -390,6 +390,7 @@ export default function DashboardPage() {
   const [syncing, setSyncing]     = useState(false);
   const [syncCount, setSyncCount] = useState(0);
   const [debugOpen, setDebugOpen] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
   const syncRef = useRef(0);
 
   /* Read company name on mount */
@@ -449,11 +450,29 @@ export default function DashboardPage() {
 
   return (
     <AuthGuard>
-      <Onboarding />
+      <Onboarding forceShow={showOnboarding} />
       <CrisisAlert status={status} riskScore={data.riskScore} daysToAlert={data.daysToAlert} />
       <SiteShell>
         <main style={{ minHeight: '100vh', background: '#EEF2F7', padding: '28px 20px', fontFamily: "'Inter', 'Plus Jakarta Sans', system-ui, sans-serif" }} dir="rtl">
           <div style={{ maxWidth: '1300px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '18px' }}>
+
+            {/* ── Real data CTA — shows when no company data saved ── */}
+            {!companyName && (
+              <div style={{ background: 'linear-gradient(135deg, rgba(37,99,235,0.15), rgba(16,185,129,0.10))', border: '1px solid rgba(37,99,235,0.3)', borderRadius: '14px', padding: '16px 22px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px', flexWrap: 'wrap', animation: 'slideDown 0.4s ease' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <span style={{ fontSize: '24px' }}>📊</span>
+                  <div>
+                    <p style={{ fontSize: '14px', fontWeight: 700, color: '#F8FAFC', marginBottom: '2px' }}>أنت تشاهد بيانات تجريبية</p>
+                    <p style={{ fontSize: '12px', color: '#64748B' }}>أدخل بيانات شركتك الحقيقية لتحليل دقيق لوضع السيولة</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => router.push('/setup')}
+                  style={{ background: '#2563EB', border: 'none', borderRadius: '10px', padding: '10px 20px', color: 'white', fontSize: '13px', fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap', boxShadow: '0 2px 12px rgba(37,99,235,0.4)', flexShrink: 0 }}>
+                  ✏️ أدخل بياناتي الآن
+                </button>
+              </div>
+            )}
 
             {/* ── LIVE ticker ── */}
             <LiveTicker onSync={handleSync} syncing={syncing} lastSynced={data.lastSynced} />
@@ -484,6 +503,11 @@ export default function DashboardPage() {
                         🏢 {companyName}
                       </span>
                     )}
+                    <button
+                      onClick={() => setShowOnboarding(true)}
+                      style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', borderRadius: '6px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)', padding: '4px 12px', color: '#64748B', fontSize: '11px', fontWeight: 500, cursor: 'pointer' }}>
+                      🎯 عرض المقدمة
+                    </button>
                     <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', borderRadius: '6px', background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.10)', padding: '4px 12px', color: '#94A3B8', fontSize: '11px', fontWeight: 500 }}>
                       <Brain size={10} /> محرك تنبؤ ذكي · يُحدَّث لحظياً
                     </span>

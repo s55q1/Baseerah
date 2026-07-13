@@ -55,7 +55,7 @@ export default function SetupPage() {
       inventoryStagnation:  s3.inventoryStagnation,
     };
     saveCompany({ name: s1.name, sector: s1.sector, size: s1.size, inputs, savedAt: new Date().toISOString() });
-    await new Promise(r => setTimeout(r, 600));
+    await new Promise(r => setTimeout(r, 1200));
     router.replace('/dashboard');
   };
 
@@ -74,8 +74,13 @@ export default function SetupPage() {
 
       <div style={{ width: '100%', maxWidth: '520px' }}>
 
-        {/* Logo */}
-        <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+        {/* Logo + back link */}
+        <div style={{ textAlign: 'center', marginBottom: '32px', position: 'relative' }}>
+          <button
+            onClick={() => router.back()}
+            style={{ position: 'absolute', right: 0, top: '50%', transform: 'translateY(-50%)', display: 'flex', alignItems: 'center', gap: '5px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', padding: '7px 12px', color: '#64748B', fontSize: '12px', fontWeight: 500, cursor: 'pointer' }}>
+            <ArrowRight size={12} /> رجوع
+          </button>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', marginBottom: '6px' }}>
             <Brain size={22} color="#60A5FA" />
             <span style={{ fontSize: '22px', fontWeight: 900, color: '#F8FAFC', letterSpacing: '-0.4px' }}>بصيرة</span>
