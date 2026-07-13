@@ -83,7 +83,7 @@ export default function LoginPage() {
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
               <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
             </svg>
-            مدعوم بالذكاء الاصطناعي · هاكاثون أمد 2026 · بنك الإنماء
+            مدعوم بالذكاء الاصطناعي · هاكاثون امد · مصرف الإنماء × طويق
           </div>
 
           <h1 style={{

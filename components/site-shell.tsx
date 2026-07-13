@@ -134,7 +134,7 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
                 </svg>
               </div>
               <p style={{ fontSize: '12px', color: '#64748b', fontWeight: 500 }}>
-                مُصمم للشركات الصغيرة والمتوسطة · هاكاثون أمد 2026 · بنك الإنماء
+                مُصمم للشركات الصغيرة والمتوسطة · هاكاثون امد · مصرف الإنماء × طويق
               </p>
             </div>
             <p style={{ fontSize: '12px', color: '#94a3b8' }}>بصيرة © 2026</p>
