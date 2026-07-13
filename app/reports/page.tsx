@@ -2,7 +2,7 @@
 
 export const dynamic = 'force-dynamic';
 
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import {
   AlertTriangle, Brain, CheckCircle2, Download,
   FileText, Landmark, Printer, Share2, Sparkles, TrendingDown,
@@ -43,8 +43,21 @@ const FINANCE_OPTIONS = [
 
 export default function ReportsPage() {
   const printRef = useRef<HTMLDivElement>(null);
+  const [copied, setCopied] = useState(false);
 
   const handlePrint = () => window.print();
+
+  const handleShare = async () => {
+    const url  = window.location.href;
+    const text = 'تقرير السيولة المالية — بصيرة AI\n\nتقرير تفصيلي لتقييم مخاطر السيولة مع توصيات تمويلية فورية.';
+    if (navigator.share) {
+      try { await navigator.share({ title: 'تقرير بصيرة', text, url }); } catch {}
+    } else {
+      await navigator.clipboard.writeText(`${text}\n${url}`);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2500);
+    }
+  };
 
   const handleExport = () => {
     // Trigger browser print dialog — user can save as PDF
@@ -81,8 +94,8 @@ export default function ReportsPage() {
                 <button onClick={handleExport} style={{ display: 'flex', alignItems: 'center', gap: '6px', background: '#2563EB', border: 'none', borderRadius: '8px', padding: '8px 16px', color: 'white', fontSize: '12px', fontWeight: 700, cursor: 'pointer', boxShadow: '0 2px 12px rgba(37,99,235,0.35)' }}>
                   <Download size={13} /> تصدير PDF
                 </button>
-                <button style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: '8px', padding: '8px 16px', color: '#CBD5E1', fontSize: '12px', fontWeight: 600, cursor: 'pointer' }}>
-                  <Share2 size={13} /> مشاركة
+                <button onClick={handleShare} style={{ display: 'flex', alignItems: 'center', gap: '6px', background: copied ? 'rgba(16,185,129,0.15)' : 'rgba(255,255,255,0.08)', border: copied ? '1px solid rgba(16,185,129,0.4)' : '1px solid rgba(255,255,255,0.12)', borderRadius: '8px', padding: '8px 16px', color: copied ? '#6EE7B7' : '#CBD5E1', fontSize: '12px', fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s' }}>
+                  <Share2 size={13} /> {copied ? 'تم النسخ ✓' : 'مشاركة'}
                 </button>
               </div>
             </div>

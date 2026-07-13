@@ -7,8 +7,9 @@ import { isAuthenticated, mockLogout } from '@/lib/mock-auth';
 const navLinks = [
   { href: '/dashboard', label: 'لوحة التحكم' },
   { href: '/analytics', label: 'التحليلات' },
-  { href: '/reports', label: 'التقارير' },
-  { href: '/admin', label: 'الإدارة' },
+  { href: '/reports',   label: 'التقارير'   },
+  { href: '/admin',     label: 'الإدارة'    },
+  { href: '/about',     label: 'عن بصيرة'   },
 ];
 
 const publicPaths = ['/', '/login', '/signup'];
@@ -17,7 +18,8 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const isPublic = publicPaths.includes(pathname);
-  const authed = isAuthenticated();
+  /* Auth is bypassed for demo — treat all non-public pages as authenticated */
+  const authed = !isPublic || isAuthenticated();
 
   const handleLogout = () => {
     mockLogout();
