@@ -24,10 +24,10 @@ const STACK = [
 
 const MILESTONES = [
   { time: 'اليوم 1',  event: 'تحديد المشكلة: 82% من الشركات تفشل بسبب السيولة' },
-  { time: 'اليوم 2',  event: 'بناء محرك التنبؤ المالي والخوارزمية المرجحة' },
-  { time: 'اليوم 3',  event: 'تصميم الواجهة الاحترافية وتجربة المستخدم' },
-  { time: 'اليوم 4',  event: 'إضافة لوحة التحكم التجريبي وسيناريوهات العرض الحي' },
-  { time: 'اليوم 5',  event: 'التحليلات، التقارير، الإدارة، ونظام التنبيهات' },
+  { time: 'اليوم 2',  event: 'بناء محرك التنبؤ المالي والخوارزمية المرجحة بـ 7 متغيرات' },
+  { time: 'اليوم 3',  event: 'تصميم الواجهة الاحترافية Dark Theme وتجربة المستخدم' },
+  { time: 'اليوم 4',  event: 'التحليلات، التقارير PDF، لوحة الإدارة، نظام التنبيهات الحي' },
+  { time: 'اليوم 5',  event: 'Wizard إدخال البيانات الحقيقية، ربط كل الصفحات بـ localStorage، PWA' },
 ];
 
 const card = {
@@ -58,11 +58,11 @@ export default function AboutPage() {
               منصة FinTech تنبئك بأزمة السيولة قبل 18 يوماً من وقوعها — بالذكاء الاصطناعي، لا بالحدس.
             </p>
             <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', marginTop: '24px', flexWrap: 'wrap' }}>
-              <Link href="/dashboard" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: '#2563EB', color: 'white', textDecoration: 'none', padding: '11px 22px', borderRadius: '10px', fontSize: '13px', fontWeight: 700, boxShadow: '0 2px 12px rgba(37,99,235,0.4)' }}>
-                <Zap size={13} /> عرض تجريبي مباشر
+              <Link href="/setup" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: '#2563EB', color: 'white', textDecoration: 'none', padding: '11px 22px', borderRadius: '10px', fontSize: '13px', fontWeight: 700, boxShadow: '0 2px 12px rgba(37,99,235,0.4)' }}>
+                <Zap size={13} /> جرّب بياناتك الآن
               </Link>
-              <Link href="/reports" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'rgba(255,255,255,0.07)', color: '#CBD5E1', textDecoration: 'none', padding: '11px 22px', borderRadius: '10px', fontSize: '13px', fontWeight: 600, border: '1px solid rgba(255,255,255,0.10)' }}>
-                عرض التقرير
+              <Link href="/dashboard" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'rgba(255,255,255,0.07)', color: '#CBD5E1', textDecoration: 'none', padding: '11px 22px', borderRadius: '10px', fontSize: '13px', fontWeight: 600, border: '1px solid rgba(255,255,255,0.10)' }}>
+                العرض التجريبي
               </Link>
             </div>
           </header>

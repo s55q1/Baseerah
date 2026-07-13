@@ -431,7 +431,7 @@ export default function DashboardPage() {
     setSyncing(true);
     await new Promise((r) => setTimeout(r, 2200));
     syncRef.current += 1;
-    setInputs((prev) => (prev === CRISIS_INPUTS || prev.riskScore > 60 ? HEALTHY_INPUTS : CRISIS_INPUTS));
+    setInputs((prev) => (prev === CRISIS_INPUTS || computeRiskScore(prev) > 60 ? HEALTHY_INPUTS : CRISIS_INPUTS));
     setSyncCount((c) => c + 1);
     setSyncing(false);
   }, [syncing]);

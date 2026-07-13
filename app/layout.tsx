@@ -8,6 +8,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://baseerah.vercel.app'),
   title: 'بصيرة | ذكاء السيولة للشركات الصغيرة والمتوسطة',
   description: 'منصة FinTech ذكية تنبئك بأزمة السيولة قبل 18 يوماً من وقوعها. تحليل مخاطر مالية بالذكاء الاصطناعي، توصيات تمويلية فورية، ومحرك تنبؤ 6 أشهر.',
   keywords: ['سيولة', 'ذكاء اصطناعي', 'FinTech', 'مخاطر مالية', 'شركات صغيرة', 'تمويل', 'بصيرة'],

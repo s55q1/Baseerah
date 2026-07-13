@@ -199,7 +199,7 @@ export default function LoginPage() {
             </p>
           </button>
 
-          <form onSubmit={handleSubmit} style={{ marginTop: '12px' }} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <form onSubmit={handleSubmit} style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <div>
               <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#374151', marginBottom: '6px' }}>
                 اسم المستخدم
