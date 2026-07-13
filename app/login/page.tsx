@@ -159,35 +159,47 @@ export default function LoginPage() {
             سجّل دخولك للوصول إلى لوحة التحكم
           </p>
 
+          {/* دخول مباشر للهاكاثون */}
+          <button
+            type="button"
+            onClick={async () => { setLoading(true); await new Promise(r => setTimeout(r, 500)); setSuccess(true); await new Promise(r => setTimeout(r, 400)); router.push('/dashboard'); }}
+            style={{
+              marginTop: '24px', width: '100%', borderRadius: '16px',
+              border: 'none', background: 'linear-gradient(135deg, #1a56db, #0A3D91)',
+              padding: '16px', cursor: 'pointer', color: 'white',
+              fontWeight: 800, fontSize: '15px', letterSpacing: '-0.2px',
+              boxShadow: '0 4px 20px rgba(10,61,145,0.35)',
+            }}
+          >
+            🚀 دخول مباشر للعرض التجريبي
+          </button>
+
+          {/* فاصل */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', margin: '16px 0' }}>
+            <div style={{ flex: 1, height: '1px', background: '#e2e8f0' }} />
+            <span style={{ color: '#94a3b8', fontSize: '12px' }}>أو سجّل دخولاً يدوياً</span>
+            <div style={{ flex: 1, height: '1px', background: '#e2e8f0' }} />
+          </div>
+
           {/* بطاقة الديمو */}
           <button
             type="button"
             onClick={fillDemo}
             style={{
-              marginTop: '24px', width: '100%', borderRadius: '16px',
-              border: '2px dashed #bfdbfe', background: 'linear-gradient(135deg, #eff6ff, #f0f9ff)',
-              padding: '14px 16px', textAlign: 'right', cursor: 'pointer',
+              width: '100%', borderRadius: '12px',
+              border: '1.5px dashed #bfdbfe', background: '#f8faff',
+              padding: '10px 16px', textAlign: 'right', cursor: 'pointer',
               transition: 'all 0.2s', display: 'block',
             }}
             onMouseEnter={(e) => (e.currentTarget.style.borderColor = '#0A3D91')}
             onMouseLeave={(e) => (e.currentTarget.style.borderColor = '#bfdbfe')}
           >
-            <p style={{ color: '#0A3D91', fontWeight: 700, fontSize: '13px' }}>
-              ⚡ اضغط لملء بيانات الديمو تلقائياً
-            </p>
-            <p style={{ color: '#60a5fa', fontSize: '12px', fontFamily: 'monospace', marginTop: '4px' }}>
-              المستخدم: admin · كلمة السر: admin
+            <p style={{ color: '#0A3D91', fontWeight: 600, fontSize: '12px' }}>
+              ⚡ ملء admin / admin تلقائياً
             </p>
           </button>
 
-          {/* فاصل */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', margin: '20px 0' }}>
-            <div style={{ flex: 1, height: '1px', background: '#e2e8f0' }} />
-            <span style={{ color: '#94a3b8', fontSize: '12px' }}>أو أدخل يدوياً</span>
-            <div style={{ flex: 1, height: '1px', background: '#e2e8f0' }} />
-          </div>
-
-          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <form onSubmit={handleSubmit} style={{ marginTop: '12px' }} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <div>
               <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#374151', marginBottom: '6px' }}>
                 اسم المستخدم

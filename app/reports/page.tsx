@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { SiteShell } from '@/components/site-shell';
 import { AuthGuard } from '@/components/auth-guard';
+import { loadCompany } from '@/lib/company-store';
 
 /* ── Report data ── */
 const REPORT_DATE = new Date().toLocaleDateString('ar-SA', { year: 'numeric', month: 'long', day: 'numeric' });
@@ -44,6 +45,49 @@ const FINANCE_OPTIONS = [
 export default function ReportsPage() {
   const printRef = useRef<HTMLDivElement>(null);
   const [copied, setCopied] = useState(false);
+
+  /* Load real company data */
+  const company    = typeof window !== 'undefined' ? loadCompany() : null;
+  const inp        = company?.inputs;
+  const companyName = company?.name ?? 'شركتك';
+
+  /* Derive live risk score and summary from inputs */
+  const liveRiskScore = inp
+    ? Math.min(100, Math.round(inp.salaryTrend * 0.40 + Math.min((inp.collectionDelay / 60) * 100, 100) * 0.35 + inp.inventoryStagnation * 0.25))
+    : 84;
+  const liveStatus = liveRiskScore >= 75 ? 'حرج — يستوجب إجراءً فورياً' : liveRiskScore >= 50 ? 'تحذير — مراقبة مستمرة' : 'مستقر — وضع جيد';
+  const liveStatusColor = liveRiskScore >= 75 ? '#D97706' : liveRiskScore >= 50 ? '#3B82F6' : '#10B981';
+
+  /* Derive live risk drivers */
+  const liveDrivers = inp ? [
+    { driver: 'ارتفاع الرواتب',  score: inp.salaryTrend,        weight: '40%', impact: inp.salaryTrend > 60 ? 'مرتفع' : 'متوسط', action: 'مراجعة هيكل الرواتب وتحديد بنود التخفيض الممكنة' },
+    { driver: 'تأخر التحصيل',    score: Math.min(Math.round((inp.collectionDelay / 60) * 100), 100), weight: '35%', impact: inp.collectionDelay > 35 ? 'مرتفع' : 'متوسط', action: 'تسريع التحصيل عبر تمويل الفواتير أو خصم الدفع المبكر' },
+    { driver: 'تكدس المخزون',    score: inp.inventoryStagnation, weight: '25%', impact: inp.inventoryStagnation > 50 ? 'مرتفع' : 'متوسط', action: 'تصفية المخزون الراكد وتحريك السيولة المجمّدة' },
+  ] : RISK_DRIVERS;
+
+  /* Derive 6-month forecast */
+  const liveForecast = inp ? (() => {
+    const MONTHS = ['يناير','فبراير','مارس','أبريل','مايو','يونيو'];
+    const totalExp = inp.operationalExpenses + inp.monthlyRevenue * (inp.burnRate / 100);
+    const collEff  = Math.max(0, 1 - inp.collectionDelay / 90);
+    const inflow   = inp.monthlyRevenue * collEff;
+    const net      = inflow - totalExp;
+    let cash = inp.currentCash;
+    return MONTHS.map((month) => {
+      cash = Math.max(0, cash + net);
+      const risk = Math.min(100, liveRiskScore + Math.random() * 4 - 2);
+      const riskRnd = Math.round(risk);
+      return {
+        month: `${month} 2025`,
+        revenue:  `${inp.monthlyRevenue.toFixed(1)}M`,
+        expenses: `${totalExp.toFixed(1)}M`,
+        net:      `${net >= 0 ? '+' : ''}${net.toFixed(2)}M`,
+        cash:     `${cash.toFixed(1)}M`,
+        risk:     riskRnd,
+        status:   riskRnd >= 75 ? 'حرج' : riskRnd >= 50 ? 'تحذير' : 'مستقر',
+      };
+    });
+  })() : FORECAST_TABLE;
 
   const handlePrint = () => window.print();
 
@@ -118,15 +162,15 @@ export default function ReportsPage() {
                     </div>
                     <h1 style={{ fontSize: '30px', fontWeight: 800, letterSpacing: '-0.5px', color: '#F8FAFC', lineHeight: 1.2 }}>
                       تقرير تقييم السيولة<br />
-                      <span style={{ color: '#60A5FA' }}>والمخاطر المالية</span>
+                      <span style={{ color: '#60A5FA' }}>{companyName}</span>
                     </h1>
                     <p style={{ color: '#64748B', fontSize: '13px', marginTop: '10px' }}>مُعدّ لإدارة الشركة والمدير المالي</p>
                   </div>
                   {/* Summary score */}
                   <div style={{ textAlign: 'center', background: 'rgba(217,119,6,0.1)', border: '1px solid rgba(217,119,6,0.3)', borderRadius: '14px', padding: '22px 28px' }}>
-                    <p style={{ fontSize: '11px', color: '#D97706', fontWeight: 600, marginBottom: '8px', letterSpacing: '0.5px' }}>مؤشر الخطر الإجمالي</p>
-                    <p style={{ fontSize: '52px', fontWeight: 900, color: '#F8FAFC', lineHeight: 1, letterSpacing: '-2px' }}>84</p>
-                    <p style={{ fontSize: '11px', color: '#D97706', fontWeight: 700, marginTop: '4px' }}>حرج — يستوجب إجراءً فورياً</p>
+                    <p style={{ fontSize: '11px', color: liveStatusColor, fontWeight: 600, marginBottom: '8px', letterSpacing: '0.5px' }}>مؤشر الخطر الإجمالي</p>
+                    <p style={{ fontSize: '52px', fontWeight: 900, color: '#F8FAFC', lineHeight: 1, letterSpacing: '-2px' }}>{liveRiskScore}</p>
+                    <p style={{ fontSize: '11px', color: liveStatusColor, fontWeight: 700, marginTop: '4px' }}>{liveStatus}</p>
                   </div>
                 </div>
 
@@ -179,7 +223,7 @@ export default function ReportsPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {RISK_DRIVERS.map((row, i) => (
+                    {liveDrivers.map((row, i) => (
                       <tr key={row.driver} style={{ borderBottom: '1px solid #F1F5F9', background: i % 2 === 0 ? '#FAFAFA' : 'white' }}>
                         <td style={{ padding: '12px 14px', fontWeight: 600, color: '#0F172A' }}>{row.driver}</td>
                         <td style={{ padding: '12px 14px' }}>
@@ -220,7 +264,7 @@ export default function ReportsPage() {
                       </tr>
                     </thead>
                     <tbody>
-                      {FORECAST_TABLE.map((row, i) => (
+                      {liveForecast.map((row, i) => (
                         <tr key={row.month} style={{ borderBottom: '1px solid #F1F5F9', background: i % 2 === 0 ? '#FAFAFA' : 'white' }}>
                           <td style={{ padding: '10px 12px', fontWeight: 600, color: '#0F172A', whiteSpace: 'nowrap' }}>{row.month}</td>
                           <td style={{ padding: '10px 12px', textAlign: 'center', color: '#059669', fontWeight: 600 }}>{row.revenue}</td>

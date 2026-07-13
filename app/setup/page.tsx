@@ -302,7 +302,7 @@ export default function SetupPage() {
           </div>
         </div>
 
-        <p style={{ textAlign: 'center', fontSize: '11px', color: '#1E293B', marginTop: '16px' }}>
+        <p style={{ textAlign: 'center', fontSize: '11px', color: '#475569', marginTop: '16px' }}>
           بياناتك محفوظة على جهازك فقط · لا ترسل لأي خادم
         </p>
       </div>

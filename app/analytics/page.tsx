@@ -13,6 +13,7 @@ import {
 } from 'recharts';
 import { SiteShell } from '@/components/site-shell';
 import { AuthGuard } from '@/components/auth-guard';
+import { loadCompany } from '@/lib/company-store';
 
 /* ── Data ── */
 const CASH_TREND = [
@@ -134,6 +135,46 @@ const card = { borderRadius: '14px', background: '#FFF', border: '1px solid #E2E
 export default function AnalyticsPage() {
   const [period, setPeriod] = useState<'week' | 'month' | 'quarter'>('month');
 
+  /* Load real company data */
+  const company = typeof window !== 'undefined' ? loadCompany() : null;
+  const inp = company?.inputs;
+  const companyName = company?.name ?? 'شركتك';
+
+  /* Derive live KPIs from real inputs if available */
+  const totalRevenue  = inp ? Math.round(inp.monthlyRevenue * 10) : 214;
+  const collectionRate = inp ? Math.max(10, Math.round(100 - inp.collectionDelay * 1.1)) : 67;
+  const burnRate      = inp ? Math.round(inp.burnRate) : 38;
+  const cashRatio     = inp ? parseFloat((inp.currentCash / (inp.operationalExpenses || 1)).toFixed(1)) : 2.4;
+
+  /* Derive 6-month cash forecast for chart */
+  const cashTrend = inp ? (() => {
+    const months = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس'];
+    const fixedCosts = inp.operationalExpenses;
+    const varCosts   = inp.monthlyRevenue * (inp.burnRate / 100);
+    const totalExp   = fixedCosts + varCosts;
+    const collEff    = Math.max(0, 1 - inp.collectionDelay / 90);
+    const inflow     = inp.monthlyRevenue * collEff;
+    const net        = inflow - totalExp;
+    let cash = inp.currentCash;
+    return months.map((month) => {
+      cash = Math.max(0, cash + net);
+      return {
+        month,
+        cash:     Math.round(cash * 10000),
+        expenses: Math.round(totalExp * 10000),
+        revenue:  Math.round(inp.monthlyRevenue * 10000),
+      };
+    });
+  })() : CASH_TREND;
+
+  /* Derive risk drivers */
+  const colRisk = inp ? Math.min(Math.round((inp.collectionDelay / 60) * 100), 100) : 54;
+  const drivers = inp ? [
+    { label: 'تأخر التحصيل',   before: Math.max(5, colRisk - 26), after: colRisk,              weight: '35%' },
+    { label: 'ارتفاع الرواتب', before: Math.max(5, inp.salaryTrend - 43), after: inp.salaryTrend, weight: '40%' },
+    { label: 'تكدس المخزون',   before: Math.max(5, inp.inventoryStagnation - 43), after: inp.inventoryStagnation, weight: '25%' },
+  ] : DRIVERS;
+
   return (
     <AuthGuard>
       <SiteShell>
@@ -149,7 +190,7 @@ export default function AnalyticsPage() {
                     <span style={{ fontSize: '11px', color: '#60A5FA', fontWeight: 600 }}>طبقة تحليل متقدمة</span>
                   </div>
                   <h1 style={{ fontSize: '28px', fontWeight: 800, color: '#F8FAFC', letterSpacing: '-0.5px', lineHeight: 1.2 }}>
-                    افهم الضغط قبل أن يصل إلى ميزانيتك
+                    {inp ? `تحليل سيولة ${companyName}` : 'افهم الضغط قبل أن يصل إلى ميزانيتك'}
                   </h1>
                   <p style={{ color: '#64748B', fontSize: '14px', marginTop: '10px' }}>
                     تحليل عميق لمسار السيولة، عوامل الخطر، ومقارنة السيناريوهات
@@ -169,10 +210,10 @@ export default function AnalyticsPage() {
             {/* ── KPI Cards ── */}
             <section style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '14px' }}>
               {[
-                { label: 'إجمالي الإيرادات', value: 214, suffix: 'K', trend: '-8%', up: false, accent: '#2563EB', icon: <TrendingUp size={15} /> },
-                { label: 'معدل التحصيل',     value: 67,  suffix: '%', trend: '-4%', up: false, accent: '#D97706', icon: <Activity size={15} /> },
-                { label: 'معدل الاحتراق',    value: 38,  suffix: '%', trend: '+6%', up: true,  accent: '#EF4444', icon: <TrendingDown size={15} /> },
-                { label: 'نسبة النقد',        value: 24,  suffix: 'x', trend: '-0.3', up: false, accent: '#10B981', icon: <BarChart3 size={15} /> },
+                { label: 'الإيراد الشهري',  value: totalRevenue,   suffix: 'K', trend: '-8%',  up: false, accent: '#2563EB', icon: <TrendingUp size={15} /> },
+                { label: 'معدل التحصيل',    value: collectionRate, suffix: '%', trend: '-4%',  up: false, accent: '#D97706', icon: <Activity size={15} /> },
+                { label: 'معدل الاحتراق',   value: burnRate,       suffix: '%', trend: '+6%',  up: true,  accent: '#EF4444', icon: <TrendingDown size={15} /> },
+                { label: 'نسبة تغطية النقد', value: Math.round(cashRatio * 10), suffix: 'x', trend: '-0.3', up: false, accent: '#10B981', icon: <BarChart3 size={15} /> },
               ].map((k) => (
                 <div key={k.label} style={{ ...card, borderTop: `2px solid ${k.accent}` }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
@@ -206,7 +247,7 @@ export default function AnalyticsPage() {
                 </div>
                 <div style={{ height: '200px' }}>
                   <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={CASH_TREND} margin={{ top: 4, right: 4, left: 0, bottom: 0 }}>
+                    <AreaChart data={cashTrend} margin={{ top: 4, right: 4, left: 0, bottom: 0 }}>
                       <defs>
                         <linearGradient id="cashGrad" x1="0" y1="0" x2="0" y2="1">
                           <stop offset="0%" stopColor="#2563EB" stopOpacity={0.15} />
@@ -258,7 +299,7 @@ export default function AnalyticsPage() {
                 </div>
                 <div style={{ height: '190px' }}>
                   <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={CASH_TREND} margin={{ top: 4, right: 4, left: 0, bottom: 0 }}>
+                    <BarChart data={cashTrend} margin={{ top: 4, right: 4, left: 0, bottom: 0 }}>
                       <XAxis dataKey="month" tickLine={false} axisLine={false} tick={{ fontSize: 10, fill: '#94A3B8' }} />
                       <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 10, fill: '#94A3B8' }} width={50} />
                       <Tooltip contentStyle={{ borderRadius: '10px', border: '1px solid #E2E8F0', fontSize: '12px' }} />
@@ -302,7 +343,7 @@ export default function AnalyticsPage() {
                   <h2 style={{ fontSize: '15px', fontWeight: 700, color: '#0F172A', marginTop: '3px' }}>عوامل الخطر: قبل وبعد</h2>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                  {DRIVERS.map((d) => (
+                  {drivers.map((d) => (
                     <div key={d.label}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                         <div>

@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Allow: /about
+Disallow: /admin
+Disallow: /setup
+
+Sitemap: https://baseerah.vercel.app/sitemap.xml
