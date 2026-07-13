@@ -18,3 +18,52 @@ body {
 * {
   @apply box-border;
 }
+
+/* ── Mobile responsiveness ── */
+@media (max-width: 768px) {
+  /* Stack 2-column grids */
+  section[style*="grid-template-columns: 1.65fr"],
+  section[style*="grid-template-columns: 1fr 1fr"],
+  section[style*="grid-template-columns: 1.4fr"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Shrink hero header padding */
+  header[style*="padding: 36px 40px"] {
+    padding: 24px 20px !important;
+  }
+
+  /* Reduce font size for hero h1 on mobile */
+  main h1[style*="font-size: 32px"] {
+    font-size: 22px !important;
+  }
+
+  /* Fix report table scroll */
+  table {
+    font-size: 12px;
+  }
+
+  /* Debug panel: full width on mobile */
+  div[style*="width: 310px"][style*="position: fixed"] {
+    width: calc(100vw - 32px) !important;
+    left: 16px !important;
+    right: 16px !important;
+  }
+
+  /* Onboarding: full width */
+  div[style*="max-width: 480px"] {
+    max-width: 100% !important;
+    margin: 0 16px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  main[style*="padding: 28px 20px"] {
+    padding: 16px 12px !important;
+  }
+
+  /* KPI grid: 2 per row on small screens */
+  section[style*="minmax(200px, 1fr)"] {
+    grid-template-columns: 1fr 1fr !important;
+  }
+}
