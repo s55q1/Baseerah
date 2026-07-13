@@ -62,7 +62,7 @@ export default function LandingPage() {
           {/* Badge */}
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: '7px', background: 'rgba(37,99,235,0.12)', border: '1px solid rgba(37,99,235,0.3)', borderRadius: '999px', padding: '6px 16px', marginBottom: '32px' }}>
             <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#10B981', display: 'inline-block', boxShadow: '0 0 6px #10B981' }} />
-            <span style={{ fontSize: '12px', color: '#60A5FA', fontWeight: 600 }}>هاكاثون أمد 2026 · مدعوم بالذكاء الاصطناعي</span>
+            <span style={{ fontSize: '12px', color: '#60A5FA', fontWeight: 600 }}>هاكاثون أمد · بنك الإنماء · مدعوم بالذكاء الاصطناعي</span>
           </div>
 
           {/* Headline */}
@@ -263,7 +263,7 @@ export default function LandingPage() {
       <footer style={{ borderTop: '1px solid rgba(255,255,255,0.06)', padding: '24px 32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <img src="/mascot.png" alt="بصيرة" style={{ width: '24px', height: '24px', objectFit: 'contain', opacity: 0.7 }} />
-          <span style={{ fontSize: '12px', color: '#334155', fontWeight: 500 }}>بصيرة © 2026 · هاكاثون أمد</span>
+          <span style={{ fontSize: '12px', color: '#334155', fontWeight: 500 }}>بصيرة © 2026 · هاكاثون أمد · بنك الإنماء</span>
         </div>
         <div style={{ display: 'flex', gap: '20px' }}>
           {[['لوحة التحكم', '/dashboard'], ['التحليلات', '/analytics'], ['التقارير', '/reports'], ['عن بصيرة', '/about']].map(([label, href]) => (

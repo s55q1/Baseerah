@@ -469,7 +469,7 @@ export default function ReportsPage() {
                   </div>
                   <div>
                     <p style={{ fontSize: '12px', fontWeight: 700, color: '#0F172A' }}>مُولَّد بواسطة بصيرة AI</p>
-                    <p style={{ fontSize: '10px', color: '#94A3B8' }}>هاكاثون أمد 2026 · محرك التنبؤ المالي</p>
+                    <p style={{ fontSize: '10px', color: '#94A3B8' }}>هاكاثون أمد 2026 · بنك الإنماء · محرك التنبؤ المالي</p>
                   </div>
                 </div>
                 <p style={{ fontSize: '11px', color: '#94A3B8' }}>هذا التقرير للأغراض التوضيحية · {REPORT_DATE}</p>

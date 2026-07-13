@@ -56,7 +56,7 @@ export default function AboutPage() {
             <div style={{ fontSize: '52px', marginBottom: '16px' }}>👁️</div>
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'rgba(37,99,235,0.15)', border: '1px solid rgba(37,99,235,0.3)', borderRadius: '6px', padding: '4px 14px', marginBottom: '16px' }}>
               <Trophy size={11} color="#FCD34D" />
-              <span style={{ fontSize: '11px', color: '#FCD34D', fontWeight: 700 }}>هاكاثون أمد 2026</span>
+              <span style={{ fontSize: '11px', color: '#FCD34D', fontWeight: 700 }}>هاكاثون أمد 2026 · بنك الإنماء</span>
             </div>
             <h1 style={{ fontSize: '36px', fontWeight: 900, color: '#F8FAFC', letterSpacing: '-0.8px', lineHeight: 1.2 }}>
               بصيرة<br />
