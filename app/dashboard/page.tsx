@@ -391,6 +391,8 @@ export default function DashboardPage() {
   const [syncCount, setSyncCount] = useState(0);
   const [debugOpen, setDebugOpen] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [demoMode, setDemoMode]   = useState(false); // true = showing demo preset
+  const realInputsRef = useRef<FinancialInputs | null>(null);
   const syncRef = useRef(0);
 
   /* Read company name on mount */
@@ -425,16 +427,30 @@ export default function DashboardPage() {
   const statusCfg = statusConfig[status];
   const recs      = RECOMMENDATIONS[data.gapSeverity];
 
-  /* Sync: toggle between CRISIS ↔ HEALTHY presets */
+  /* Sync: if real data exists, toggle demo/real; otherwise toggle crisis/healthy */
   const handleSync = useCallback(async () => {
     if (syncing) return;
     setSyncing(true);
     await new Promise((r) => setTimeout(r, 2200));
     syncRef.current += 1;
-    setInputs((prev) => (prev === CRISIS_INPUTS || computeRiskScore(prev) > 60 ? HEALTHY_INPUTS : CRISIS_INPUTS));
+    const saved = loadCompany();
+    if (saved?.inputs) {
+      if (demoMode) {
+        // return to real data
+        setInputs(saved.inputs as FinancialInputs);
+        setDemoMode(false);
+      } else {
+        // save real inputs, switch to demo scenario
+        realInputsRef.current = saved.inputs as FinancialInputs;
+        setInputs(computeRiskScore(saved.inputs as FinancialInputs) > 60 ? HEALTHY_INPUTS : CRISIS_INPUTS);
+        setDemoMode(true);
+      }
+    } else {
+      setInputs((prev) => (computeRiskScore(prev) > 60 ? HEALTHY_INPUTS : CRISIS_INPUTS));
+    }
     setSyncCount((c) => c + 1);
     setSyncing(false);
-  }, [syncing]);
+  }, [syncing, demoMode]);
 
   /* Count-up animations — re-trigger on input changes */
   const cashAnim   = useCountUp(Math.round(data.cashMillions * 10), 1600, 200);

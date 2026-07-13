@@ -115,9 +115,27 @@ export default function ReportsPage() {
         <style>{`
           @media print {
             .no-print { display: none !important; }
-            .print-page { margin: 0; padding: 24px; background: white !important; }
-            body { background: white !important; }
+            body, main { background: white !important; color: #0f172a !important; }
             header, footer, nav { display: none !important; }
+            * { color-adjust: exact; -webkit-print-color-adjust: exact; }
+            .print-page { margin: 0; padding: 0; }
+            /* force dark cards to be white on print */
+            [style*="background: #0F172A"],
+            [style*="background: #1E293B"],
+            [style*="background: linear-gradient"] {
+              background: #f8fafc !important;
+              border: 1px solid #e2e8f0 !important;
+            }
+            /* force all text visible */
+            [style*="color: #F8FAFC"],
+            [style*="color: #CBD5E1"],
+            [style*="color: #94A3B8"] {
+              color: #0f172a !important;
+            }
+            [style*="color: #64748B"],
+            [style*="color: #475569"] {
+              color: #374151 !important;
+            }
           }
           @keyframes slideDown { from{opacity:0;transform:translateY(-6px)} to{opacity:1;transform:translateY(0)} }
         `}</style>
