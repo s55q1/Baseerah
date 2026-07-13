@@ -78,7 +78,7 @@ export default function LandingPage() {
           </p>
 
           {/* CTAs */}
-          <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
+          <div className="landing-hero-btns" style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
             <button
               onClick={handleCTA}
               style={{ background: 'linear-gradient(135deg, #2563EB, #1d4ed8)', border: 'none', borderRadius: '14px', padding: '16px 36px', color: 'white', fontSize: '16px', fontWeight: 800, cursor: 'pointer', boxShadow: '0 4px 24px rgba(37,99,235,0.45)', letterSpacing: '-0.2px' }}>
@@ -114,7 +114,7 @@ export default function LandingPage() {
             <p style={{ fontSize: '11px', color: '#475569', fontWeight: 600, letterSpacing: '2px', marginBottom: '10px' }}>المشكلة والحل</p>
             <h2 style={{ fontSize: '32px', fontWeight: 800, color: '#F8FAFC', letterSpacing: '-0.6px' }}>لماذا تفشل الشركات؟</h2>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+          <div className="landing-grid-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
             <div style={{ background: 'rgba(239,68,68,0.06)', border: '1px solid rgba(239,68,68,0.15)', borderRadius: '16px', padding: '32px' }}>
               <div style={{ fontSize: '36px', marginBottom: '16px' }}>😰</div>
               <h3 style={{ fontSize: '18px', fontWeight: 700, color: '#FCA5A5', marginBottom: '12px' }}>بدون بصيرة</h3>
@@ -146,7 +146,7 @@ export default function LandingPage() {
             <p style={{ fontSize: '11px', color: '#475569', fontWeight: 600, letterSpacing: '2px', marginBottom: '10px' }}>كيف يعمل</p>
             <h2 style={{ fontSize: '32px', fontWeight: 800, color: '#F8FAFC', letterSpacing: '-0.6px' }}>3 خطوات للتحكم في سيولتك</h2>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
+          <div className="landing-grid-3" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
             {HOW.map((h) => (
               <div key={h.num} style={{ background: '#1E293B', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '16px', padding: '32px 24px', position: 'relative' }}>
                 <div style={{ position: 'absolute', top: '20px', left: '20px', fontSize: '11px', fontWeight: 700, color: '#1E3A5F', letterSpacing: '1px' }}>{h.num}</div>
@@ -155,6 +155,83 @@ export default function LandingPage() {
                 <p style={{ fontSize: '13px', color: '#64748B', lineHeight: 1.7 }}>{h.body}</p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Product Preview (Dashboard mockup) ── */}
+      <section style={{ padding: '0 32px 80px' }}>
+        <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: '40px' }}>
+            <p style={{ fontSize: '11px', color: '#475569', fontWeight: 600, letterSpacing: '2px', marginBottom: '10px' }}>المنتج</p>
+            <h2 style={{ fontSize: '32px', fontWeight: 800, color: '#F8FAFC', letterSpacing: '-0.6px' }}>شاهد بصيرة تعمل</h2>
+            <p style={{ fontSize: '14px', color: '#64748B', marginTop: '10px' }}>لوحة تحكم ذكية تعطيك صورة كاملة عن صحة سيولتك</p>
+          </div>
+
+          {/* Mockup frame */}
+          <div style={{ background: '#1E293B', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '20px', padding: '3px', boxShadow: '0 24px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05)' }}>
+            {/* Window chrome */}
+            <div style={{ background: '#0F172A', borderRadius: '17px 17px 0 0', padding: '10px 16px', display: 'flex', alignItems: 'center', gap: '8px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+              <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#EF4444' }} />
+              <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#F59E0B' }} />
+              <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#10B981' }} />
+              <div style={{ flex: 1, margin: '0 16px', background: 'rgba(255,255,255,0.05)', borderRadius: '5px', height: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <span style={{ fontSize: '10px', color: '#475569' }}>baseerah.vercel.app/dashboard</span>
+              </div>
+            </div>
+
+            {/* Dashboard content mockup */}
+            <div style={{ background: '#EEF2F7', borderRadius: '0 0 17px 17px', padding: '16px', direction: 'rtl' }}>
+              {/* Top KPI row */}
+              <div className="landing-mockup-kpi" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '10px', marginBottom: '12px' }}>
+                {[
+                  { label: 'مؤشر الخطر', value: '84', color: '#EF4444', sub: 'حرج' },
+                  { label: 'الرصيد النقدي', value: '8.2M', color: '#3B82F6', sub: 'ر.س' },
+                  { label: 'مدة التشغيل', value: '92 يوم', color: '#D97706', sub: 'ينفد سبتمبر' },
+                  { label: 'صافي الشهر', value: '-0.32M', color: '#EF4444', sub: 'خسارة' },
+                ].map((k) => (
+                  <div key={k.label} style={{ background: 'white', borderRadius: '10px', padding: '12px', border: '1px solid #E2E8F0' }}>
+                    <p style={{ fontSize: '9px', color: '#94A3B8', marginBottom: '4px' }}>{k.label}</p>
+                    <p style={{ fontSize: '18px', fontWeight: 900, color: k.color, lineHeight: 1 }}>{k.value}</p>
+                    <p style={{ fontSize: '9px', color: '#CBD5E1', marginTop: '2px' }}>{k.sub}</p>
+                  </div>
+                ))}
+              </div>
+
+              {/* Middle row: chart + gauge */}
+              <div className="landing-mockup-row" style={{ display: 'grid', gridTemplateColumns: '1fr 200px', gap: '10px', marginBottom: '12px' }}>
+                {/* Fake bar chart */}
+                <div style={{ background: 'white', borderRadius: '10px', padding: '14px', border: '1px solid #E2E8F0' }}>
+                  <p style={{ fontSize: '10px', fontWeight: 700, color: '#0F172A', marginBottom: '12px' }}>توقعات السيولة — 6 أشهر</p>
+                  <div style={{ display: 'flex', alignItems: 'flex-end', gap: '8px', height: '70px' }}>
+                    {[88, 72, 65, 58, 44, 32].map((h, i) => (
+                      <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
+                        <div style={{ width: '100%', height: `${h}%`, borderRadius: '4px 4px 0 0', background: h > 70 ? '#EF4444' : h > 50 ? '#D97706' : '#10B981' }} />
+                        <span style={{ fontSize: '8px', color: '#CBD5E1' }}>{['يناير','فبراير','مارس','أبريل','مايو','يونيو'][i].slice(0,3)}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Risk gauge */}
+                <div style={{ background: '#0F172A', borderRadius: '10px', padding: '14px', border: '1px solid rgba(255,255,255,0.06)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                  <p style={{ fontSize: '9px', color: '#64748B', marginBottom: '8px' }}>مؤشر الخطر</p>
+                  <svg viewBox="0 0 80 50" width="120" height="75">
+                    <path d="M 10 45 A 30 30 0 0 1 70 45" fill="none" stroke="#1E293B" strokeWidth="6" strokeLinecap="round"/>
+                    <path d="M 10 45 A 30 30 0 0 1 70 45" fill="none" stroke="#EF4444" strokeWidth="6" strokeLinecap="round" strokeDasharray="94" strokeDashoffset="24"/>
+                    <text x="40" y="42" textAnchor="middle" fill="#F8FAFC" fontSize="14" fontWeight="900">84</text>
+                  </svg>
+                  <span style={{ fontSize: '9px', color: '#EF4444', fontWeight: 700 }}>⚠ خطر حرج</span>
+                </div>
+              </div>
+
+              {/* Alert strip */}
+              <div style={{ background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: '8px', padding: '10px 14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ fontSize: '12px' }}>⚠️</span>
+                <p style={{ fontSize: '10px', color: '#92400E', fontWeight: 600 }}>تحذير: الرصيد النقدي سينفد خلال 92 يوماً — يُنصح بالتحرك الفوري للحصول على تمويل</p>
+                <button style={{ marginRight: 'auto', background: '#D97706', border: 'none', borderRadius: '5px', padding: '4px 10px', color: 'white', fontSize: '9px', fontWeight: 700, cursor: 'default', flexShrink: 0 }}>اتخذ إجراءً</button>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -198,10 +275,20 @@ export default function LandingPage() {
       <style>{`
         @media (max-width: 768px) {
           section { padding-left: 16px !important; padding-right: 16px !important; }
+          header { padding: 0 16px !important; }
         }
-        @media (max-width: 600px) {
-          div[style*="gridTemplateColumns: '1fr 1fr'"] { grid-template-columns: 1fr !important; }
-          div[style*="gridTemplateColumns: 'repeat(3"] { grid-template-columns: 1fr !important; }
+        @media (max-width: 640px) {
+          .landing-grid-2 { grid-template-columns: 1fr !important; }
+          .landing-grid-3 { grid-template-columns: 1fr !important; }
+          .landing-grid-4 { grid-template-columns: repeat(2, 1fr) !important; }
+          .landing-hero-btns { flex-direction: column !important; align-items: stretch !important; }
+          .landing-hero-btns button { text-align: center !important; }
+          .landing-nav-actions .nav-login { display: none !important; }
+          .landing-mockup-row { grid-template-columns: 1fr !important; }
+          .landing-mockup-kpi { grid-template-columns: repeat(2,1fr) !important; }
+          .landing-mockup-bars { display: none !important; }
+          .landing-footer { flex-direction: column !important; align-items: flex-start !important; gap: 16px !important; }
+          .landing-footer-links { flex-wrap: wrap !important; gap: 12px !important; }
         }
       `}</style>
     </div>

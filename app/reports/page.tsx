@@ -58,12 +58,99 @@ export default function ReportsPage() {
   const liveStatus = liveRiskScore >= 75 ? 'حرج — يستوجب إجراءً فورياً' : liveRiskScore >= 50 ? 'تحذير — مراقبة مستمرة' : 'مستقر — وضع جيد';
   const liveStatusColor = liveRiskScore >= 75 ? '#D97706' : liveRiskScore >= 50 ? '#3B82F6' : '#10B981';
 
+  /* Derived KPI values from real inputs */
+  const totalExpM   = inp ? inp.operationalExpenses + inp.monthlyRevenue * (inp.burnRate / 100) : 3.82;
+  const collEff     = inp ? Math.max(0, 1 - inp.collectionDelay / 90) : 0.92;
+  const inflowM     = inp ? inp.monthlyRevenue * collEff : 3.5;
+  const netMonthM   = inp ? inflowM - totalExpM : -0.32;
+  const runwayDays  = inp && netMonthM < 0
+    ? Math.round((inp.currentCash / Math.abs(netMonthM)) * 30)
+    : 365;
+  const cashDisplay = inp ? `${inp.currentCash.toFixed(1)}M ر.س` : '8.2M ر.س';
+  const cashSub     = inp ? (inp.currentCash < 5 ? 'منخفض جداً' : inp.currentCash < 15 ? 'منخفض' : 'معتدل') : 'منخفض';
+  const runwayDisplay = runwayDays >= 365 ? '+365 يوم' : `${runwayDays} يوم`;
+  const runwaySub   = runwayDays < 60 ? 'خطر وشيك' : runwayDays < 120 ? `ينفد قريباً` : 'وضع مقبول';
+  const netDisplay  = `${netMonthM >= 0 ? '+' : ''}${netMonthM.toFixed(2)}M`;
+  const netSub      = netMonthM < 0 ? 'خسارة صافية' : 'ربح صافي';
+
+  /* Dynamic executive summary text */
+  const summaryLevel  = liveRiskScore >= 75 ? 'حرج' : liveRiskScore >= 50 ? 'تحذير' : 'مستقر';
+  const summaryAction = liveRiskScore >= 75 ? 'يستوجب اتخاذ إجراء خلال 18 يوماً' : liveRiskScore >= 50 ? 'يتطلب مراقبة مستمرة' : 'استمر في المراقبة الدورية';
+  const burnoutMonthStr = (() => {
+    if (!inp || netMonthM >= 0) return null;
+    const months = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+    const d = new Date();
+    d.setMonth(d.getMonth() + Math.ceil(runwayDays / 30));
+    return months[d.getMonth()];
+  })();
+  const lossK         = Math.abs(netMonthM * 1000).toFixed(0);
+  const salarySharePct = inp ? Math.min(99, Math.round((inp.operationalExpenses * inp.salaryTrend / 100) / Math.max(0.01, totalExpM) * 100)) : 43;
+  const frozenInventory = inp ? (inp.currentCash * inp.inventoryStagnation / 200).toFixed(1) : '1.2';
+
   /* Derive live risk drivers */
   const liveDrivers = inp ? [
     { driver: 'ارتفاع الرواتب',  score: inp.salaryTrend,        weight: '40%', impact: inp.salaryTrend > 60 ? 'مرتفع' : 'متوسط', action: 'مراجعة هيكل الرواتب وتحديد بنود التخفيض الممكنة' },
     { driver: 'تأخر التحصيل',    score: Math.min(Math.round((inp.collectionDelay / 60) * 100), 100), weight: '35%', impact: inp.collectionDelay > 35 ? 'مرتفع' : 'متوسط', action: 'تسريع التحصيل عبر تمويل الفواتير أو خصم الدفع المبكر' },
     { driver: 'تكدس المخزون',    score: inp.inventoryStagnation, weight: '25%', impact: inp.inventoryStagnation > 50 ? 'مرتفع' : 'متوسط', action: 'تصفية المخزون الراكد وتحريك السيولة المجمّدة' },
   ] : RISK_DRIVERS;
+
+  /* Derive live recommendations from real inputs */
+  const liveRecs = inp ? (() => {
+    const results: { priority: number; action: string; type: string; savings: string }[] = [];
+
+    if (inp.salaryTrend > 50) {
+      const cut = Math.round((inp.salaryTrend - 30) / 2);
+      const saving = ((inp.operationalExpenses * cut) / 100 * 1000).toFixed(0);
+      results.push({
+        priority: 0,
+        action: `خفض التكاليف التشغيلية ${cut}% خلال 30 يوماً عبر مراجعة العقود والمصروفات المتكررة`,
+        type: inp.salaryTrend > 70 ? 'critical' : 'urgent',
+        savings: `${saving}K ر.س`,
+      });
+    }
+
+    if (inp.collectionDelay > 25) {
+      const freed = (inp.monthlyRevenue * inp.collectionDelay / 90).toFixed(2);
+      results.push({
+        priority: 0,
+        action: `تمويل الفواتير بمعدل 2.1% — تحرير ${freed}M ر.س سيولة معلقة فوراً`,
+        type: inp.collectionDelay > 45 ? 'urgent' : 'moderate',
+        savings: `${(parseFloat(freed) * 1000).toFixed(0)}K ر.س`,
+      });
+    }
+
+    if (inp.collectionDelay > 20) {
+      const newDelay = Math.round(inp.collectionDelay * 0.55);
+      const gained = (inp.monthlyRevenue * (inp.collectionDelay - newDelay) / 30).toFixed(2);
+      results.push({
+        priority: 0,
+        action: `تخفيض دورة التحصيل من ${inp.collectionDelay} إلى ${newDelay} يوماً بخصم الدفع المبكر 1–2%`,
+        type: 'moderate',
+        savings: `${(parseFloat(gained) * 1000).toFixed(0)}K ر.س`,
+      });
+    }
+
+    if (inp.inventoryStagnation > 40) {
+      const frozen = (inp.currentCash * inp.inventoryStagnation / 250).toFixed(2);
+      results.push({
+        priority: 0,
+        action: `تصفية المخزون الراكد (${inp.inventoryStagnation}% ركود) — تحريك ${frozen}M ر.س مجمّدة`,
+        type: inp.inventoryStagnation > 65 ? 'urgent' : 'moderate',
+        savings: `${(parseFloat(frozen) * 1000).toFixed(0)}K ر.س`,
+      });
+    }
+
+    if (results.length === 0) {
+      results.push({
+        priority: 1,
+        action: 'التفاوض مع الموردين لتمديد شروط الدفع 30–45 يوماً — تحرير تدفق نقدي إضافي',
+        type: 'moderate',
+        savings: `${(inp.operationalExpenses * 100).toFixed(0)}K ر.س`,
+      });
+    }
+
+    return results.slice(0, 4).map((r, i) => ({ ...r, priority: i + 1 }));
+  })() : RECS;
 
   /* Derive 6-month forecast */
   const liveForecast = inp ? (() => {
@@ -138,6 +225,11 @@ export default function ReportsPage() {
             }
           }
           @keyframes slideDown { from{opacity:0;transform:translateY(-6px)} to{opacity:1;transform:translateY(0)} }
+          @media (max-width: 640px) {
+            .kpi-strip { grid-template-columns: repeat(2,1fr) !important; }
+            .finance-grid { grid-template-columns: 1fr !important; }
+            .action-bar { flex-direction: column !important; align-items: flex-start !important; }
+          }
         `}</style>
 
         <main className="print-page" style={{ minHeight: '100vh', background: '#EEF2F7', padding: '28px 20px', fontFamily: "'Inter', system-ui, sans-serif" }} dir="rtl">
@@ -193,12 +285,12 @@ export default function ReportsPage() {
                 </div>
 
                 {/* KPI strip */}
-                <div style={{ marginTop: '28px', display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px' }}>
+                <div className="kpi-strip" style={{ marginTop: '28px', display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px' }}>
                   {[
-                    { label: 'الرصيد النقدي',  value: '8.2M ر.س',  sub: 'منخفض' },
-                    { label: 'مدة التشغيل',    value: '92 يوم',     sub: 'ينفد سبتمبر' },
-                    { label: 'وقت التحذير',    value: '18 يوم',     sub: 'قبل الأزمة' },
-                    { label: 'الفجوة الشهرية', value: '-0.32M',     sub: 'خسارة صافية' },
+                    { label: 'الرصيد النقدي',  value: cashDisplay,     sub: cashSub },
+                    { label: 'مدة التشغيل',    value: runwayDisplay,   sub: runwaySub },
+                    { label: 'وقت التحذير',    value: '18 يوم',        sub: 'قبل الأزمة' },
+                    { label: 'الفجوة الشهرية', value: netDisplay,      sub: netSub },
                   ].map((k) => (
                     <div key={k.label} style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '10px', padding: '14px' }}>
                       <p style={{ fontSize: '10px', color: '#64748B', marginBottom: '6px' }}>{k.label}</p>
@@ -215,14 +307,18 @@ export default function ReportsPage() {
                   <Brain size={14} color="#2563EB" />
                   <h2 style={{ fontSize: '16px', fontWeight: 700, color: '#0F172A' }}>الملخص التنفيذي</h2>
                 </div>
-                <div style={{ background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: '10px', padding: '16px', marginBottom: '14px', display: 'flex', gap: '12px' }}>
-                  <AlertTriangle size={16} color="#D97706" style={{ flexShrink: 0, marginTop: '2px' }} />
-                  <p style={{ fontSize: '13px', color: '#92400E', lineHeight: 1.75, fontWeight: 500 }}>
-                    يكشف محرك بصيرة للذكاء الاصطناعي عن <strong>خطر حرج</strong> في السيولة يستوجب اتخاذ إجراء خلال <strong>18 يوماً</strong>. الرصيد النقدي في مسار تنازلي بمعدل 320K ر.س شهرياً، وإذا استمر هذا المسار، ستنفد السيولة التشغيلية بحلول <strong>سبتمبر 2025</strong>.
+                <div style={{ background: liveRiskScore >= 75 ? '#FFFBEB' : liveRiskScore >= 50 ? '#EFF6FF' : '#ECFDF5', border: `1px solid ${liveRiskScore >= 75 ? '#FDE68A' : liveRiskScore >= 50 ? '#BFDBFE' : '#6EE7B7'}`, borderRadius: '10px', padding: '16px', marginBottom: '14px', display: 'flex', gap: '12px' }}>
+                  <AlertTriangle size={16} color={liveStatusColor} style={{ flexShrink: 0, marginTop: '2px' }} />
+                  <p style={{ fontSize: '13px', color: liveRiskScore >= 75 ? '#92400E' : liveRiskScore >= 50 ? '#1E40AF' : '#065F46', lineHeight: 1.75, fontWeight: 500 }}>
+                    يكشف محرك بصيرة للذكاء الاصطناعي عن <strong>خطر {summaryLevel}</strong> في السيولة لدى {companyName} — {summaryAction}.
+                    {netMonthM < 0 && ` الرصيد النقدي في مسار تنازلي بمعدل ${lossK}K ر.س شهرياً`}
+                    {burnoutMonthStr && `، وإذا استمر هذا المسار ستنفد السيولة التشغيلية بحلول ${burnoutMonthStr}.`}
+                    {netMonthM >= 0 && ' التدفق النقدي إيجابي حالياً — حافظ على هذا المستوى.'}
                   </p>
                 </div>
                 <p style={{ fontSize: '13px', color: '#475569', lineHeight: 1.8 }}>
-                  المحركات الأساسية: ارتفاع تكاليف الرواتب (+43% من التدفقات الخارجة)، وتأخر التحصيل (متوسط 52 يوماً)، وتكدس مخزون بقيمة 1.2M ر.س. التوصية العاجلة: مزيج من تمويل الفواتير (سيولة فورية) وتفاوض مع الموردين (تأجيل مدفوعات 30-45 يوماً).
+                  المحركات الأساسية: ارتفاع تكاليف الرواتب (+{salarySharePct}% من التدفقات الخارجة){inp && inp.collectionDelay > 20 ? `، وتأخر التحصيل (متوسط ${inp.collectionDelay} يوماً)` : ''}{inp && inp.inventoryStagnation > 30 ? `، وتكدس مخزون مقدّر بـ ${frozenInventory}M ر.س` : ''}.
+                  {' '}التوصية العاجلة: {liveRecs[0]?.action ?? 'مراجعة التكاليف وتمويل الفواتير'}.
                 </p>
               </div>
 
@@ -314,7 +410,7 @@ export default function ReportsPage() {
                   <h2 style={{ fontSize: '16px', fontWeight: 700, color: '#0F172A' }}>خطة الإجراءات المقترحة</h2>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  {RECS.map((rec) => {
+                  {liveRecs.map((rec) => {
                     const cfg = rec.type === 'critical'
                       ? { color: '#991B1B', bg: '#FEF2F2', border: '#FECACA', label: 'فوري' }
                       : rec.type === 'urgent'
@@ -341,7 +437,7 @@ export default function ReportsPage() {
                   <Landmark size={14} color="#2563EB" />
                   <h2 style={{ fontSize: '16px', fontWeight: 700, color: '#0F172A' }}>خيارات التمويل المتاحة</h2>
                 </div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>
+                <div className="finance-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>
                   {FINANCE_OPTIONS.map((opt) => (
                     <div key={opt.name} style={{ borderRadius: '12px', padding: '18px', border: opt.best ? '2px solid #BFDBFE' : '1px solid #E2E8F0', background: opt.best ? '#F0F7FF' : '#FAFAFA', position: 'relative' }}>
                       {opt.best && (

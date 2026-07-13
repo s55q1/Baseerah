@@ -28,6 +28,7 @@ const MILESTONES = [
   { time: 'اليوم 3',  event: 'تصميم الواجهة الاحترافية Dark Theme وتجربة المستخدم' },
   { time: 'اليوم 4',  event: 'التحليلات، التقارير PDF، لوحة الإدارة، نظام التنبيهات الحي' },
   { time: 'اليوم 5',  event: 'Wizard إدخال البيانات الحقيقية، ربط كل الصفحات بـ localStorage، PWA' },
+  { time: 'اليوم 6',  event: 'محاكي "ماذا لو؟"، طلب التمويل الذكي، تقرير PDF كامل بالبيانات الحية — تقديم النهائي' },
 ];
 
 const card = {
@@ -41,6 +42,13 @@ export default function AboutPage() {
   return (
     <SiteShell>
       <main style={{ minHeight: '100vh', background: '#EEF2F7', padding: '28px 20px', fontFamily: "'Inter', system-ui, sans-serif" }} dir="rtl">
+        <style>{`
+          @media (max-width: 640px) {
+            .about-grid-3 { grid-template-columns: 1fr !important; }
+            .about-grid-2 { grid-template-columns: 1fr !important; }
+            .about-stats  { grid-template-columns: repeat(2,1fr) !important; }
+          }
+        `}</style>
         <div style={{ maxWidth: '900px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '18px' }}>
 
           {/* ── Hero ── */}
@@ -68,7 +76,7 @@ export default function AboutPage() {
           </header>
 
           {/* ── Problem / Solution / Impact ── */}
-          <section style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '14px' }}>
+          <section className="about-grid-3" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '14px' }}>
             {[
               { emoji: '😰', tag: 'المشكلة', color: '#D97706', body: '82% من الشركات الصغيرة تفشل بسبب أزمات سيولة لم تكن تتوقعها. لا تحذير، لا وقت للتصرف.' },
               { emoji: '🧠', tag: 'الحل',     color: '#2563EB', body: 'محرك AI يحسب درجة خطر مرجحة من 3 عوامل ويتنبأ بمسار الرصيد 6 أشهر مستقبلاً — لحظياً.' },
@@ -105,7 +113,7 @@ export default function AboutPage() {
           </div>
 
           {/* ── Tech Stack + Timeline ── */}
-          <section style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+          <section className="about-grid-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
             <div style={card}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '7px', marginBottom: '18px' }}>
                 <Sparkles size={14} color="#2563EB" />
@@ -147,7 +155,7 @@ export default function AboutPage() {
           </section>
 
           {/* ── Stats strip ── */}
-          <div style={{ background: 'linear-gradient(135deg, #0F172A 0%, #1E293B 100%)', borderRadius: '14px', padding: '28px 32px', display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0', border: '1px solid rgba(255,255,255,0.04)' }}>
+          <div className="about-stats" style={{ background: 'linear-gradient(135deg, #0F172A 0%, #1E293B 100%)', borderRadius: '14px', padding: '28px 32px', display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0', border: '1px solid rgba(255,255,255,0.04)' }}>
             {[
               { value: '18',  label: 'يوم تحذير مسبق',   color: '#D97706' },
               { value: '92%', label: 'دقة التنبؤ',         color: '#2563EB' },
