@@ -15,6 +15,20 @@ import { SiteShell } from '@/components/site-shell';
 import { AuthGuard } from '@/components/auth-guard';
 import { loadCompany } from '@/lib/company-store';
 
+/* ── Sector benchmarks ── */
+const SECTOR_BENCHMARKS: Record<string, { burnRate: number; collectionDelay: number; salaryTrend: number }> = {
+  'تجزئة':            { burnRate: 33, collectionDelay: 20, salaryTrend: 30 },
+  'إنشاءات':          { burnRate: 48, collectionDelay: 45, salaryTrend: 40 },
+  'تقنية':            { burnRate: 55, collectionDelay: 30, salaryTrend: 50 },
+  'غذاء وضيافة':      { burnRate: 42, collectionDelay: 14, salaryTrend: 35 },
+  'لوجستيات':         { burnRate: 38, collectionDelay: 25, salaryTrend: 28 },
+  'استيراد وتصدير':   { burnRate: 36, collectionDelay: 35, salaryTrend: 25 },
+  'خدمات مهنية':      { burnRate: 45, collectionDelay: 28, salaryTrend: 55 },
+  'صحة':              { burnRate: 40, collectionDelay: 22, salaryTrend: 60 },
+  'تعليم':            { burnRate: 35, collectionDelay: 18, salaryTrend: 45 },
+  'أخرى':             { burnRate: 40, collectionDelay: 28, salaryTrend: 38 },
+};
+
 /* ── Data ── */
 const CASH_TREND = [
   { month: 'يناير', cash: 195000, expenses: 142000, revenue: 168000 },
@@ -175,6 +189,52 @@ export default function AnalyticsPage() {
     { label: 'تكدس المخزون',   before: Math.max(5, inp.inventoryStagnation - 43), after: inp.inventoryStagnation, weight: '25%' },
   ] : DRIVERS;
 
+  /* Sector benchmarks */
+  const sector    = company?.sector ?? '';
+  const benchmark = SECTOR_BENCHMARKS[sector] ?? SECTOR_BENCHMARKS['أخرى'];
+
+  /* Personalized AI insights from real numbers */
+  const personalInsights = inp ? (() => {
+    const monthlyCostOfDelay = parseFloat((inp.monthlyRevenue * (inp.collectionDelay / 90) * 0.18).toFixed(2));
+    const savingIfReduced    = parseFloat((monthlyCostOfDelay * 0.55).toFixed(2));
+    const burnDiff           = inp.burnRate - benchmark.burnRate;
+    const delayDiff          = inp.collectionDelay - benchmark.collectionDelay;
+    const salaryDiff         = inp.salaryTrend - benchmark.salaryTrend;
+    const totalExp           = inp.operationalExpenses + inp.monthlyRevenue * (inp.burnRate / 100);
+    const netMonthly         = inp.monthlyRevenue * 0.75 - totalExp;
+
+    const list = [];
+
+    if (inp.collectionDelay > 20)
+      list.push({ icon: <AlertTriangle size={13} />, color: '#D97706', bg: '#FFFBEB',
+        text: `تأخر التحصيل ${inp.collectionDelay} يوماً يُكلّفك ${monthlyCostOfDelay}M ر.س شهرياً — تخفيضه لـ 20 يوم يُحرّر ${savingIfReduced}M فورياً` });
+
+    if (burnDiff > 5)
+      list.push({ icon: <TrendingDown size={13} />, color: '#EF4444', bg: '#FEF2F2',
+        text: `معدل احتراقك ${inp.burnRate}% أعلى من متوسط قطاع ${sector || 'السوق'} البالغ ${benchmark.burnRate}% — فرق ${burnDiff.toFixed(0)} نقطة يضغط على السيولة` });
+
+    if (netMonthly < 0)
+      list.push({ icon: <TrendingDown size={13} />, color: '#EF4444', bg: '#FEF2F2',
+        text: `الصافي الشهري سالب (${netMonthly.toFixed(2)}M ر.س) — الرصيد يتآكل بمعدل ${Math.abs(netMonthly).toFixed(2)}M شهرياً` });
+    else
+      list.push({ icon: <CheckCircle2 size={13} />, color: '#059669', bg: '#ECFDF5',
+        text: `الصافي الشهري إيجابي (+${netMonthly.toFixed(2)}M ر.س) — استثمر الفائض في أدوات سيولة قصيرة الأجل` });
+
+    if (delayDiff > 10)
+      list.push({ icon: <Clock size={13} />, color: '#7C3AED', bg: '#F5F3FF',
+        text: `تأخر تحصيلك أعلى من متوسط القطاع بـ ${delayDiff} يوماً — تمويل الفواتير بمعدل 2.1% يسد الفجوة فوراً` });
+
+    if (salaryDiff > 10)
+      list.push({ icon: <AlertTriangle size={13} />, color: '#D97706', bg: '#FFFBEB',
+        text: `ضغط الرواتب لديك (${inp.salaryTrend}%) أعلى من متوسط القطاع (${benchmark.salaryTrend}%) — مراجعة هيكل التعويضات مقترحة` });
+
+    if (inp.inventoryStagnation > 50)
+      list.push({ icon: <Clock size={13} />, color: '#7C3AED', bg: '#F5F3FF',
+        text: `تكدس المخزون ${inp.inventoryStagnation}% — تصفية المخزون الراكد يمكن أن يُحرّر ${(inp.currentCash * 0.12).toFixed(2)}M ر.س` });
+
+    return list.slice(0, 4);
+  })() : AI_INSIGHTS;
+
   return (
     <AuthGuard>
       <SiteShell>
@@ -280,13 +340,19 @@ export default function AnalyticsPage() {
                   </span>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  {AI_INSIGHTS.map((ins, i) => (
+                  {personalInsights.map((ins, i) => (
                     <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '10px', padding: '11px' }}>
                       <div style={{ flexShrink: 0, background: ins.bg + '22', color: ins.color, borderRadius: '6px', padding: '5px', display: 'flex' }}>{ins.icon}</div>
                       <p style={{ fontSize: '12px', color: '#94A3B8', lineHeight: 1.6 }}>{ins.text}</p>
                     </div>
                   ))}
                 </div>
+                {inp && sector && (
+                  <div style={{ marginTop: '12px', background: 'rgba(37,99,235,0.08)', border: '1px solid rgba(37,99,235,0.15)', borderRadius: '10px', padding: '10px 14px' }}>
+                    <p style={{ fontSize: '10px', color: '#60A5FA', fontWeight: 600, marginBottom: '2px' }}>مقارنة بقطاع {sector}</p>
+                    <p style={{ fontSize: '11px', color: '#475569' }}>احتراق {benchmark.burnRate}% · تحصيل {benchmark.collectionDelay}د · رواتب {benchmark.salaryTrend}%</p>
+                  </div>
+                )}
               </div>
             </section>
 
@@ -369,7 +435,43 @@ export default function AnalyticsPage() {
                 </div>
               </div>
 
-              <QuickCalc />
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                <QuickCalc />
+                {/* Sector Benchmarking */}
+                {inp && sector && (
+                  <div style={{ ...card, background: '#0F172A', border: '1px solid rgba(255,255,255,0.06)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '7px', marginBottom: '16px' }}>
+                      <Brain size={14} color="#A78BFA" />
+                      <span style={{ fontSize: '14px', fontWeight: 700, color: '#F8FAFC' }}>مقارنة بالقطاع</span>
+                      <span style={{ marginRight: 'auto', fontSize: '10px', color: '#475569', background: 'rgba(167,139,250,0.12)', border: '1px solid rgba(167,139,250,0.2)', borderRadius: '4px', padding: '2px 8px' }}>{sector}</span>
+                    </div>
+                    {[
+                      { label: 'معدل الاحتراق', yours: inp.burnRate, avg: benchmark.burnRate, unit: '%', higherIsBad: true },
+                      { label: 'تأخر التحصيل', yours: inp.collectionDelay, avg: benchmark.collectionDelay, unit: 'د', higherIsBad: true },
+                      { label: 'ضغط الرواتب',  yours: inp.salaryTrend, avg: benchmark.salaryTrend, unit: '%', higherIsBad: true },
+                    ].map((b) => {
+                      const diff = b.yours - b.avg;
+                      const worse = b.higherIsBad ? diff > 0 : diff < 0;
+                      const color = worse ? '#FCA5A5' : '#6EE7B7';
+                      return (
+                        <div key={b.label} style={{ marginBottom: '14px' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
+                            <span style={{ fontSize: '12px', color: '#94A3B8' }}>{b.label}</span>
+                            <span style={{ fontSize: '12px', fontWeight: 700, color }}>
+                              أنت: {b.yours}{b.unit} · متوسط: {b.avg}{b.unit}
+                              <span style={{ marginRight: '6px', fontSize: '10px' }}>({diff > 0 ? '+' : ''}{diff}{b.unit})</span>
+                            </span>
+                          </div>
+                          <div style={{ position: 'relative', height: '5px', background: 'rgba(255,255,255,0.06)', borderRadius: '999px' }}>
+                            <div style={{ position: 'absolute', height: '100%', width: `${Math.min(b.avg, 100)}%`, background: 'rgba(255,255,255,0.15)', borderRadius: '999px' }} />
+                            <div style={{ position: 'absolute', height: '100%', width: `${Math.min(b.yours, 100)}%`, background: color, borderRadius: '999px', transition: 'width 1.2s ease' }} />
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
             </section>
 
             {/* ── Scenario Comparison Table ── */}
