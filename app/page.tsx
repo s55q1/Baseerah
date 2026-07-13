@@ -2,13 +2,17 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { isAuthenticated } from '@/lib/mock-auth';
+import { hasCompany } from '@/lib/company-store';
 
 export default function HomePage() {
   const router = useRouter();
 
   useEffect(() => {
-    router.replace('/dashboard');
+    if (hasCompany()) {
+      router.replace('/dashboard');
+    } else {
+      router.replace('/setup');
+    }
   }, [router]);
 
   return (

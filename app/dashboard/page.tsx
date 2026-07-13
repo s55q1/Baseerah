@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   ArrowLeft, BarChart3, Brain, CircleAlert, Clock3,
   Landmark, RefreshCw, Settings2, Sparkles, TrendingDown, TrendingUp, Wallet, Zap,
@@ -12,6 +13,7 @@ import { SiteShell } from '@/components/site-shell';
 import { AuthGuard } from '@/components/auth-guard';
 import { Onboarding } from '@/components/onboarding';
 import { CrisisAlert } from '@/components/crisis-alert';
+import { loadCompany, saveCompany, type FinancialInputs as StoredInputs } from '@/lib/company-store';
 
 /* ════════════════════════════════════════════════════════════════
    FINANCIAL ENGINE — LAYER 1: Input Model
@@ -361,8 +363,13 @@ function DebugPanel({ inputs, onChange, onClose }: DebugPanelProps) {
         <SliderRow label="تكدس المخزون"         field="inventoryStagnation" min={0} max={100} unit="%" />
       </div>
 
-      <div style={{ padding: '10px 18px', borderTop: '1px solid rgba(255,255,255,0.07)' }}>
-        <p style={{ fontSize: '10px', color: '#334155', textAlign: 'center' }}>Shift+D لفتح/إغلاق اللوحة</p>
+      <div style={{ padding: '12px 18px', borderTop: '1px solid rgba(255,255,255,0.07)', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+        <button
+          onClick={() => { if (typeof window !== 'undefined') window.location.href = '/setup'; }}
+          style={{ width: '100%', background: 'rgba(37,99,235,0.12)', border: '1px solid rgba(37,99,235,0.25)', borderRadius: '8px', padding: '9px', color: '#60A5FA', fontSize: '12px', fontWeight: 600, cursor: 'pointer' }}>
+          ✏️ تعديل بيانات شركتي
+        </button>
+        <p style={{ fontSize: '10px', color: '#1E3A5F', textAlign: 'center' }}>Shift+D لفتح/إغلاق اللوحة</p>
       </div>
     </div>
   );
@@ -372,11 +379,32 @@ function DebugPanel({ inputs, onChange, onClose }: DebugPanelProps) {
    MAIN PAGE
    ════════════════════════════════════════════════════════════════ */
 export default function DashboardPage() {
-  const [inputs, setInputs]       = useState<FinancialInputs>(CRISIS_INPUTS);
+  const router = useRouter();
+
+  /* Load real company data from localStorage, fallback to demo */
+  const [inputs, setInputs] = useState<FinancialInputs>(() => {
+    const saved = loadCompany();
+    return (saved?.inputs as FinancialInputs) ?? CRISIS_INPUTS;
+  });
+  const [companyName, setCompanyName] = useState<string>('');
   const [syncing, setSyncing]     = useState(false);
   const [syncCount, setSyncCount] = useState(0);
   const [debugOpen, setDebugOpen] = useState(false);
   const syncRef = useRef(0);
+
+  /* Read company name on mount */
+  useEffect(() => {
+    const saved = loadCompany();
+    if (saved?.name) setCompanyName(saved.name);
+  }, []);
+
+  /* Persist inputs to localStorage whenever they change */
+  useEffect(() => {
+    const saved = loadCompany();
+    if (saved) {
+      saveCompany({ ...saved, inputs, savedAt: new Date().toISOString() });
+    }
+  }, [inputs]);
 
   /* Keyboard shortcut: Shift+D */
   useEffect(() => {
@@ -451,6 +479,11 @@ export default function DashboardPage() {
               <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexWrap: 'wrap', gap: '32px', alignItems: 'center', justifyContent: 'space-between' }}>
                 <div style={{ flex: 1, minWidth: '280px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '20px', flexWrap: 'wrap' }}>
+                    {companyName && (
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', borderRadius: '6px', background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.10)', padding: '4px 12px', color: '#F8FAFC', fontSize: '11px', fontWeight: 700 }}>
+                        🏢 {companyName}
+                      </span>
+                    )}
                     <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', borderRadius: '6px', background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.10)', padding: '4px 12px', color: '#94A3B8', fontSize: '11px', fontWeight: 500 }}>
                       <Brain size={10} /> محرك تنبؤ ذكي · يُحدَّث لحظياً
                     </span>
