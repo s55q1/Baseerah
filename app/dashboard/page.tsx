@@ -389,10 +389,13 @@ export default function DashboardPage() {
   const [companyName, setCompanyName] = useState<string>('');
   const [syncing, setSyncing]     = useState(false);
   const [syncCount, setSyncCount] = useState(0);
-  const [debugOpen, setDebugOpen]     = useState(false);
+  const [debugOpen, setDebugOpen]       = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
-  const [demoMode, setDemoMode]       = useState(false);
-  const [alertModal, setAlertModal]   = useState(false);
+  const [demoMode, setDemoMode]         = useState(false);
+  const [alertModal, setAlertModal]     = useState(false);
+  const [financeModal, setFinanceModal] = useState(false);
+  const [scenarioOpen, setScenarioOpen] = useState(false);
+  const [scenarioInputs, setScenarioInputs] = useState<FinancialInputs | null>(null);
   const realInputsRef = useRef<FinancialInputs | null>(null);
   const syncRef = useRef(0);
 
@@ -720,14 +723,182 @@ export default function DashboardPage() {
                     </div>
                   ))}
                 </div>
-                <button style={{ marginTop: '14px', width: '100%', borderRadius: '10px', background: '#2563EB', padding: '12px', fontSize: '13px', fontWeight: 600, color: 'white', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '7px', boxShadow: '0 2px 12px rgba(37,99,235,0.30)', transition: 'background 0.2s' }}>
+                <button
+                  onClick={() => setFinanceModal(true)}
+                  style={{ marginTop: '14px', width: '100%', borderRadius: '10px', background: '#2563EB', padding: '12px', fontSize: '13px', fontWeight: 600, color: 'white', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '7px', boxShadow: '0 2px 12px rgba(37,99,235,0.30)', transition: 'background 0.2s' }}>
                   <TrendingUp size={13} /> طلب تمويل الآن <ArrowLeft size={12} />
                 </button>
               </div>
             </section>
 
+            {/* ── Scenario Simulator ── */}
+            <div style={{ ...card, border: '1px solid rgba(109,40,217,0.2)', background: 'linear-gradient(135deg, #1E1B4B 0%, #1E293B 100%)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: scenarioOpen ? '20px' : '0' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <Sparkles size={14} color="#A78BFA" />
+                  <h2 style={{ fontSize: '15px', fontWeight: 700, color: '#F8FAFC' }}>محاكي السيناريوهات — ماذا لو؟</h2>
+                  <span style={{ fontSize: '10px', color: '#7C3AED', background: 'rgba(124,58,237,0.15)', border: '1px solid rgba(124,58,237,0.25)', borderRadius: '4px', padding: '2px 8px', fontWeight: 600 }}>AI</span>
+                </div>
+                <button
+                  onClick={() => { setScenarioOpen(v => !v); if (!scenarioInputs) setScenarioInputs({ ...inputs }); }}
+                  style={{ display: 'flex', alignItems: 'center', gap: '5px', background: scenarioOpen ? 'rgba(167,139,250,0.15)' : 'rgba(255,255,255,0.06)', border: `1px solid ${scenarioOpen ? 'rgba(167,139,250,0.35)' : 'rgba(255,255,255,0.10)'}`, borderRadius: '8px', padding: '7px 14px', color: scenarioOpen ? '#A78BFA' : '#94A3B8', fontSize: '12px', fontWeight: 600, cursor: 'pointer' }}>
+                  {scenarioOpen ? '▲ إخفاء' : '▼ جرّب الآن'}
+                </button>
+              </div>
+
+              {scenarioOpen && scenarioInputs && (() => {
+                const simData    = deriveSnapshot(scenarioInputs);
+                const simStatus  = computeLiquidityStatus(simData);
+                const riskDelta  = simData.riskScore - data.riskScore;
+                const cashDelta  = simData.cashMillions - data.cashMillions;
+                const runwayDelta = simData.runwayDays - data.runwayDays;
+                const simColor   = simStatus === 'stable' ? '#10B981' : simStatus === 'warning' ? '#D97706' : '#EF4444';
+
+                const sl = (field: keyof FinancialInputs, label: string, min: number, max: number, step = 1, unit = '') => (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span style={{ fontSize: '11px', color: '#94A3B8' }}>{label}</span>
+                      <span style={{ fontSize: '12px', fontWeight: 700, color: '#F8FAFC' }}>{(scenarioInputs[field] as number).toFixed(step < 1 ? 1 : 0)}{unit}</span>
+                    </div>
+                    <input type="range" min={min} max={max} step={step}
+                      value={scenarioInputs[field] as number}
+                      onChange={e => setScenarioInputs(p => p ? { ...p, [field]: parseFloat(e.target.value) } : p)}
+                      style={{ width: '100%', accentColor: '#A78BFA' }} />
+                  </div>
+                );
+
+                return (
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                    {/* Left: sliders */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                      <p style={{ fontSize: '10px', color: '#6D28D9', fontWeight: 700, letterSpacing: '1px' }}>عدّل المتغيرات</p>
+                      {sl('collectionDelay',     'تأخر التحصيل (يوم)',        0, 90,  1,  ' د')}
+                      {sl('burnRate',            'معدل الاحتراق (%)',          5, 95,  1,  '%')}
+                      {sl('salaryTrend',         'ضغط الرواتب (%)',            0, 100, 1,  '%')}
+                      {sl('inventoryStagnation', 'تكدس المخزون (%)',           0, 100, 1,  '%')}
+                      {sl('monthlyRevenue',      'الإيراد الشهري (M ر.س)',    0.5, 30, 0.1, 'M')}
+                      <button onClick={() => setScenarioInputs({ ...inputs })} style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', padding: '7px', color: '#475569', fontSize: '11px', cursor: 'pointer', fontWeight: 600 }}>↺ إعادة تعيين</button>
+                    </div>
+
+                    {/* Right: results */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                      <p style={{ fontSize: '10px', color: '#6D28D9', fontWeight: 700, letterSpacing: '1px' }}>النتائج الفورية</p>
+
+                      {/* Risk score comparison */}
+                      <div style={{ background: 'rgba(255,255,255,0.04)', border: `1px solid ${simColor}30`, borderRadius: '12px', padding: '14px', textAlign: 'center' }}>
+                        <p style={{ fontSize: '10px', color: '#64748B', marginBottom: '6px' }}>درجة الخطر</p>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px' }}>
+                          <span style={{ fontSize: '28px', fontWeight: 900, color: '#64748B', textDecoration: 'line-through', opacity: 0.5 }}>{data.riskScore}</span>
+                          <span style={{ fontSize: '14px', color: riskDelta < 0 ? '#10B981' : '#EF4444' }}>→</span>
+                          <span style={{ fontSize: '36px', fontWeight: 900, color: simColor }}>{simData.riskScore}</span>
+                        </div>
+                        <span style={{ fontSize: '13px', fontWeight: 700, color: riskDelta < 0 ? '#10B981' : '#EF4444' }}>
+                          {riskDelta > 0 ? '+' : ''}{riskDelta} نقطة
+                        </span>
+                      </div>
+
+                      {[
+                        { label: 'مدة التشغيل', before: data.runwayDays, after: simData.runwayDays, delta: runwayDelta, unit: ' يوم', good: runwayDelta > 0 },
+                        { label: 'الرصيد النقدي', before: data.cashMillions.toFixed(1), after: simData.cashMillions.toFixed(1), delta: cashDelta, unit: 'M', good: cashDelta > 0 },
+                      ].map(m => (
+                        <div key={m.label} style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '10px', padding: '12px' }}>
+                          <p style={{ fontSize: '10px', color: '#64748B', marginBottom: '6px' }}>{m.label}</p>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <span style={{ fontSize: '14px', color: '#334155', textDecoration: 'line-through' }}>{m.before}{m.unit}</span>
+                            <span style={{ fontSize: '11px', color: '#334155' }}>→</span>
+                            <span style={{ fontSize: '18px', fontWeight: 800, color: m.good ? '#10B981' : '#EF4444' }}>{m.after}{m.unit}</span>
+                            <span style={{ fontSize: '11px', fontWeight: 700, color: m.good ? '#10B981' : '#EF4444', marginRight: 'auto' }}>
+                              ({m.delta > 0 ? '+' : ''}{typeof m.delta === 'number' ? m.delta.toFixed(m.unit === 'M' ? 1 : 0) : m.delta}{m.unit})
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+
+                      <div style={{ background: `${simColor}10`, border: `1px solid ${simColor}25`, borderRadius: '10px', padding: '10px 12px' }}>
+                        <p style={{ fontSize: '11px', color: simColor, fontWeight: 700 }}>
+                          {simStatus === 'stable' ? '✅ هذا السيناريو يُحسّن وضعك للمستقر' : simStatus === 'warning' ? '⚠️ لا يزال في نطاق التحذير' : '🔴 الوضع لا يزال حرجاً'}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
+            </div>
+
           </div>
         </main>
+
+        {/* ── Finance Application Modal ── */}
+        {financeModal && (() => {
+          const recommended = data.gapSeverity === 'minor' ? 'تمويل الفواتير' : data.gapSeverity === 'critical' ? 'خط رأس المال العامل' : 'قرض قصير الأجل';
+          const amount = Math.max(0.5, Math.abs((inputs.operationalExpenses + inputs.monthlyRevenue * (inputs.burnRate / 100)) - inputs.monthlyRevenue * 0.75) * 3).toFixed(1);
+          const options = [
+            { name: 'تمويل الفواتير',       rate: '2.1%', term: '3-7 أيام',    max: '2M ر.س',  icon: '📄', best: data.gapSeverity === 'minor' },
+            { name: 'خط رأس المال العامل', rate: '8.9%', term: '12 أسبوعاً',  max: '5M ر.س',  icon: '🏦', best: data.gapSeverity === 'critical' },
+            { name: 'قرض قصير الأجل',      rate: '11.2%', term: '6 أشهر',     max: '10M ر.س', icon: '💰', best: data.gapSeverity === 'stable' },
+          ];
+          return (
+            <div style={{ position: 'fixed', inset: 0, zIndex: 99998, background: 'rgba(15,23,42,0.8)', backdropFilter: 'blur(6px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }} onClick={() => setFinanceModal(false)}>
+              <div style={{ width: '100%', maxWidth: '460px', background: '#1E293B', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.07)', boxShadow: '0 32px 80px rgba(0,0,0,0.5)', overflow: 'hidden' }} onClick={e => e.stopPropagation()} dir="rtl">
+                {/* Header */}
+                <div style={{ background: 'linear-gradient(135deg, #0F172A, #1E293B)', padding: '24px 24px 20px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                    <div>
+                      <div style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', background: 'rgba(37,99,235,0.15)', border: '1px solid rgba(37,99,235,0.3)', borderRadius: '5px', padding: '3px 10px', marginBottom: '10px' }}>
+                        <Landmark size={10} color="#60A5FA" />
+                        <span style={{ fontSize: '10px', color: '#60A5FA', fontWeight: 600 }}>طلب تمويل — بصيرة AI</span>
+                      </div>
+                      <h2 style={{ fontSize: '20px', fontWeight: 800, color: '#F8FAFC', letterSpacing: '-0.3px' }}>{companyName || 'شركتك'}</h2>
+                      <p style={{ fontSize: '12px', color: '#475569', marginTop: '4px' }}>مبلغ التمويل المقترح: <strong style={{ color: '#60A5FA' }}>{amount}M ر.س</strong></p>
+                    </div>
+                    <button onClick={() => setFinanceModal(false)} style={{ background: 'none', border: 'none', color: '#475569', cursor: 'pointer', fontSize: '20px', lineHeight: 1 }}>×</button>
+                  </div>
+                  {/* Risk badge */}
+                  <div style={{ marginTop: '14px', display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                    <span style={{ fontSize: '11px', color: '#FCD34D', background: 'rgba(217,119,6,0.12)', border: '1px solid rgba(217,119,6,0.25)', borderRadius: '5px', padding: '3px 10px', fontWeight: 600 }}>درجة الخطر: {data.riskScore}/100</span>
+                    <span style={{ fontSize: '11px', color: '#93C5FD', background: 'rgba(37,99,235,0.10)', border: '1px solid rgba(37,99,235,0.2)', borderRadius: '5px', padding: '3px 10px', fontWeight: 600 }}>مدة التشغيل: {data.runwayDays} يوم</span>
+                    <span style={{ fontSize: '11px', color: '#6EE7B7', background: 'rgba(16,185,129,0.10)', border: '1px solid rgba(16,185,129,0.2)', borderRadius: '5px', padding: '3px 10px', fontWeight: 600 }}>الموصى به: {recommended}</span>
+                  </div>
+                </div>
+
+                {/* Options */}
+                <div style={{ padding: '18px 24px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  <p style={{ fontSize: '11px', color: '#475569', fontWeight: 600, letterSpacing: '0.5px', marginBottom: '4px' }}>اختر خيار التمويل</p>
+                  {options.map(opt => (
+                    <div key={opt.name} style={{ borderRadius: '12px', padding: '14px 16px', border: opt.best ? '1.5px solid #2563EB' : '1px solid rgba(255,255,255,0.07)', background: opt.best ? 'rgba(37,99,235,0.10)' : 'rgba(255,255,255,0.03)', cursor: 'pointer', transition: 'all 0.2s' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                          <span style={{ fontSize: '20px' }}>{opt.icon}</span>
+                          <div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                              <p style={{ fontSize: '13px', fontWeight: 700, color: '#F1F5F9' }}>{opt.name}</p>
+                              {opt.best && <span style={{ fontSize: '9px', fontWeight: 700, color: 'white', background: '#2563EB', borderRadius: '3px', padding: '2px 6px' }}>الأفضل</span>}
+                            </div>
+                            <p style={{ fontSize: '11px', color: '#475569', marginTop: '2px' }}>حتى {opt.max} · {opt.term}</p>
+                          </div>
+                        </div>
+                        <span style={{ fontSize: '16px', fontWeight: 800, color: opt.best ? '#60A5FA' : '#64748B' }}>{opt.rate}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Submit simulation */}
+                <div style={{ padding: '0 24px 24px' }}>
+                  <button
+                    onClick={() => {
+                      setFinanceModal(false);
+                      setTimeout(() => alert(`✅ تم إرسال طلب التمويل!\n\nالشركة: ${companyName || 'شركتك'}\nالمبلغ: ${amount}M ر.س\nالخيار: ${recommended}\n\nسيتواصل معك ممثل البنك خلال 24 ساعة.`), 100);
+                    }}
+                    style={{ width: '100%', background: 'linear-gradient(135deg, #2563EB, #1d4ed8)', border: 'none', borderRadius: '12px', padding: '14px', color: 'white', fontSize: '14px', fontWeight: 800, cursor: 'pointer', boxShadow: '0 4px 20px rgba(37,99,235,0.4)', letterSpacing: '-0.2px' }}>
+                    🏦 تقديم طلب التمويل الآن
+                  </button>
+                  <p style={{ textAlign: 'center', fontSize: '11px', color: '#334155', marginTop: '10px' }}>محاكاة تجريبية — بدون التزام مالي</p>
+                </div>
+              </div>
+            </div>
+          );
+        })()}
 
         {/* ── WhatsApp/Email Alert Simulation Modal ── */}
         {alertModal && (
