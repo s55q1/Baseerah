@@ -8,7 +8,7 @@ import {
   Clock, DollarSign, Settings, Shield, TrendingUp, Users, Zap,
 } from 'lucide-react';
 import {
-  Bar, BarChart, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis,
+  Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis,
 } from 'recharts';
 import { SiteShell } from '@/components/site-shell';
 import { AuthGuard } from '@/components/auth-guard';

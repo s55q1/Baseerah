@@ -1,6 +1,6 @@
 'use client';
 
-import { Brain, Github, Linkedin, Sparkles, Target, Trophy, Zap } from 'lucide-react';
+import { Brain, Sparkles, Target, Trophy, Zap } from 'lucide-react';
 import Link from 'next/link';
 import { SiteShell } from '@/components/site-shell';
 

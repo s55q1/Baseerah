@@ -8,7 +8,7 @@ import {
   CheckCircle2, Clock, Sparkles, TrendingDown, TrendingUp,
 } from 'lucide-react';
 import {
-  Area, AreaChart, Bar, BarChart, CartesianGrid,
+  Area, AreaChart, Bar, BarChart,
   Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis,
 } from 'recharts';
 import { SiteShell } from '@/components/site-shell';
