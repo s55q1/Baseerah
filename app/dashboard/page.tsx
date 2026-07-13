@@ -11,6 +11,7 @@ import {
 import { SiteShell } from '@/components/site-shell';
 import { AuthGuard } from '@/components/auth-guard';
 import { Onboarding } from '@/components/onboarding';
+import { CrisisAlert } from '@/components/crisis-alert';
 
 /* ════════════════════════════════════════════════════════════════
    FINANCIAL ENGINE — LAYER 1: Input Model
@@ -421,6 +422,7 @@ export default function DashboardPage() {
   return (
     <AuthGuard>
       <Onboarding />
+      <CrisisAlert status={status} riskScore={data.riskScore} daysToAlert={data.daysToAlert} />
       <SiteShell>
         <main style={{ minHeight: '100vh', background: '#EEF2F7', padding: '28px 20px', fontFamily: "'Inter', 'Plus Jakarta Sans', system-ui, sans-serif" }} dir="rtl">
           <div style={{ maxWidth: '1300px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '18px' }}>
