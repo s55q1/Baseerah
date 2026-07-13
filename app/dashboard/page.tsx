@@ -6,13 +6,13 @@ import {
   Landmark, RefreshCw, Sparkles, TrendingDown, TrendingUp, Wallet, Zap,
 } from 'lucide-react';
 import {
-  Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis,
+  Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis,
 } from 'recharts';
 import { SiteShell } from '@/components/site-shell';
 import { AuthGuard } from '@/components/auth-guard';
 
 /* ════════════════════════════════════════════════════
-   1. LIQUIDITY PREDICTION ENGINE
+   LIQUIDITY PREDICTION ENGINE — logic unchanged
    ════════════════════════════════════════════════════ */
 type LiquidityStatus = 'critical' | 'warning' | 'stable';
 
@@ -28,7 +28,6 @@ interface FinancialSnapshot {
 
 function computeLiquidityStatus(snapshot: FinancialSnapshot): LiquidityStatus {
   const { riskScore, runwayDays, cashTrend } = snapshot;
-  // declining if last value < first value
   const declining = cashTrend[cashTrend.length - 1].cash < cashTrend[0].cash;
   if (riskScore >= 75 || runwayDays < 30) return 'critical';
   if (riskScore >= 50 || declining) return 'warning';
@@ -36,34 +35,35 @@ function computeLiquidityStatus(snapshot: FinancialSnapshot): LiquidityStatus {
 }
 
 /* ════════════════════════════════════════════════════
-   2. ACTIONABLE INSIGHTS — per status
+   ACTIONABLE INSIGHTS — logic unchanged
    ════════════════════════════════════════════════════ */
 const insightsByStatus: Record<LiquidityStatus, { text: string; urgency: string; urgencyColor: string; urgencyBg: string }[]> = {
   critical: [
-    { text: 'خفض المصروفات التشغيلية بنسبة 8% خلال 30 يوماً',         urgency: 'عاجل',       urgencyColor: '#b91c1c', urgencyBg: '#fef2f2' },
-    { text: 'تسريع تحصيل الفواتير وعرض خصم 2% للدفع المبكر',          urgency: 'مهم',        urgencyColor: '#c2410c', urgencyBg: '#fff7ed' },
-    { text: 'استكشاف خط تمويل رأس المال العامل قبل نفاد الرصيد',       urgency: 'استراتيجي',  urgencyColor: '#1d4ed8', urgencyBg: '#eff6ff' },
+    { text: 'خفض المصروفات التشغيلية بنسبة 8% خلال 30 يوماً',       urgency: 'عاجل',      urgencyColor: '#B45309', urgencyBg: '#FFFBEB' },
+    { text: 'تسريع تحصيل الفواتير وعرض خصم 2% للدفع المبكر',        urgency: 'مهم',       urgencyColor: '#0369A1', urgencyBg: '#F0F9FF' },
+    { text: 'استكشاف خط تمويل رأس المال العامل قبل نفاد الرصيد',     urgency: 'استراتيجي', urgencyColor: '#6D28D9', urgencyBg: '#F5F3FF' },
   ],
   warning: [
-    { text: 'مراجعة بنود الإنفاق وتأجيل المصروفات غير الضرورية 14 يوماً', urgency: 'مهم',      urgencyColor: '#c2410c', urgencyBg: '#fff7ed' },
-    { text: 'التفاوض مع الموردين على تمديد فترة السداد 30 يوماً',          urgency: 'مقترح',    urgencyColor: '#1d4ed8', urgencyBg: '#eff6ff' },
-    { text: 'مراقبة مؤشر السيولة أسبوعياً وإعداد خطة طوارئ',              urgency: 'استراتيجي', urgencyColor: '#6b21a8', urgencyBg: '#f5f3ff' },
+    { text: 'مراجعة بنود الإنفاق وتأجيل المصروفات غير الضرورية 14 يوماً', urgency: 'مهم',       urgencyColor: '#0369A1', urgencyBg: '#F0F9FF' },
+    { text: 'التفاوض مع الموردين على تمديد فترة السداد 30 يوماً',          urgency: 'مقترح',     urgencyColor: '#6D28D9', urgencyBg: '#F5F3FF' },
+    { text: 'مراقبة مؤشر السيولة أسبوعياً وإعداد خطة طوارئ',              urgency: 'استراتيجي', urgencyColor: '#065F46', urgencyBg: '#ECFDF5' },
   ],
   stable: [
-    { text: 'الوضع المالي مستقر — استمر في مراقبة التدفقات شهرياً',    urgency: 'مستقر',     urgencyColor: '#166534', urgencyBg: '#f0fdf4' },
-    { text: 'فرصة جيدة للنظر في استثمار الفائض النقدي',                urgency: 'فرصة',      urgencyColor: '#0369a1', urgencyBg: '#f0f9ff' },
-    { text: 'قم بمراجعة شروط التمويل الحالية للحصول على معدلات أفضل',  urgency: 'مقترح',     urgencyColor: '#1d4ed8', urgencyBg: '#eff6ff' },
+    { text: 'الوضع المالي مستقر — استمر في مراقبة التدفقات شهرياً',   urgency: 'مستقر',  urgencyColor: '#065F46', urgencyBg: '#ECFDF5' },
+    { text: 'فرصة جيدة للنظر في استثمار الفائض النقدي',               urgency: 'فرصة',   urgencyColor: '#0369A1', urgencyBg: '#F0F9FF' },
+    { text: 'قم بمراجعة شروط التمويل الحالية للحصول على معدلات أفضل', urgency: 'مقترح',  urgencyColor: '#6D28D9', urgencyBg: '#F5F3FF' },
   ],
 };
 
+/* Enterprise-refined status palette — soft, authoritative */
 const statusConfig: Record<LiquidityStatus, { label: string; color: string; bg: string; border: string; dot: string }> = {
-  critical: { label: 'حرج',   color: '#b91c1c', bg: 'rgba(239,68,68,0.08)',  border: 'rgba(239,68,68,0.3)',  dot: '#ef4444' },
-  warning:  { label: 'تحذير', color: '#c2410c', bg: 'rgba(249,115,22,0.08)', border: 'rgba(249,115,22,0.3)', dot: '#f97316' },
-  stable:   { label: 'مستقر', color: '#166534', bg: 'rgba(34,197,94,0.08)',  border: 'rgba(34,197,94,0.3)',  dot: '#22c55e' },
+  critical: { label: 'حرج',   color: '#92400E', bg: 'rgba(217,119,6,0.08)',  border: 'rgba(217,119,6,0.25)',  dot: '#D97706' },
+  warning:  { label: 'تحذير', color: '#1E40AF', bg: 'rgba(37,99,235,0.07)',  border: 'rgba(37,99,235,0.22)',  dot: '#3B82F6' },
+  stable:   { label: 'مستقر', color: '#065F46', bg: 'rgba(16,185,129,0.07)', border: 'rgba(16,185,129,0.22)', dot: '#10B981' },
 };
 
 /* ════════════════════════════════════════════════════
-   3. DATA SNAPSHOTS (initial + post-sync)
+   DATA SNAPSHOTS — unchanged
    ════════════════════════════════════════════════════ */
 const INITIAL_DATA: FinancialSnapshot = {
   riskScore: 84, cashMillions: 8.2, runwayDays: 92, daysToAlert: 18,
@@ -77,9 +77,9 @@ const INITIAL_DATA: FinancialSnapshot = {
     { month: 'سبتمبر',cash: 76000,  runway: 92  },
   ],
   riskDrivers: [
-    { label: 'ارتفاع الرواتب', value: 72, color: '#ef4444, #dc2626' },
-    { label: 'تأخر التحصيل',   value: 54, color: '#f97316, #ea580c' },
-    { label: 'تكدس المخزون',   value: 41, color: '#eab308, #ca8a04' },
+    { label: 'ارتفاع الرواتب', value: 72, color: '#D97706, #B45309' },
+    { label: 'تأخر التحصيل',   value: 54, color: '#3B82F6, #2563EB' },
+    { label: 'تكدس المخزون',   value: 41, color: '#8B5CF6, #7C3AED' },
   ],
 };
 
@@ -95,13 +95,13 @@ const SYNCED_DATA: FinancialSnapshot = {
     { month: 'سبتمبر',cash: 110000, runway: 160 },
   ],
   riskDrivers: [
-    { label: 'ارتفاع الرواتب', value: 55, color: '#f97316, #ea580c' },
-    { label: 'تأخر التحصيل',   value: 38, color: '#eab308, #ca8a04' },
-    { label: 'تكدس المخزون',   value: 29, color: '#22c55e, #16a34a' },
+    { label: 'ارتفاع الرواتب', value: 55, color: '#3B82F6, #2563EB' },
+    { label: 'تأخر التحصيل',   value: 38, color: '#8B5CF6, #7C3AED' },
+    { label: 'تكدس المخزون',   value: 29, color: '#10B981, #059669' },
   ],
 };
 
-/* ── Count-up hook ── */
+/* ── Count-up hook — unchanged ── */
 function useCountUp(target: number, duration = 1400, delay = 0) {
   const [value, setValue] = useState(0);
   useEffect(() => {
@@ -110,8 +110,7 @@ function useCountUp(target: number, duration = 1400, delay = 0) {
       const start = performance.now();
       const tick = (now: number) => {
         const p = Math.min((now - start) / duration, 1);
-        const ease = 1 - Math.pow(1 - p, 3);
-        setValue(Math.round(target * ease));
+        setValue(Math.round(target * (1 - Math.pow(1 - p, 3))));
         if (p < 1) requestAnimationFrame(tick);
       };
       requestAnimationFrame(tick);
@@ -121,7 +120,7 @@ function useCountUp(target: number, duration = 1400, delay = 0) {
   return value;
 }
 
-/* ── Risk Gauge ── */
+/* ── Risk Gauge — enterprise colors ── */
 function RiskGauge({ score }: { score: number }) {
   const [displayed, setDisplayed] = useState(0);
   useEffect(() => {
@@ -138,25 +137,28 @@ function RiskGauge({ score }: { score: number }) {
     return () => clearTimeout(id);
   }, [score]);
 
-  const r = 52, circ = 2 * Math.PI * r;
+  const r = 50, circ = 2 * Math.PI * r;
   const dash = (displayed / 100) * circ;
-  const color = score >= 75 ? '#ef4444' : score >= 50 ? '#f97316' : '#22c55e';
+  /* Soft amber for critical, blue for warning, emerald for stable */
+  const color = score >= 75 ? '#D97706' : score >= 50 ? '#3B82F6' : '#10B981';
 
   return (
     <svg width="130" height="130" viewBox="0 0 130 130" style={{ display: 'block', margin: '0 auto' }}>
-      <circle cx="65" cy="65" r={r} fill="none" stroke="#f1f5f9" strokeWidth="10" />
-      <circle cx="65" cy="65" r={r} fill="none" stroke={color} strokeWidth="10"
+      {/* Track */}
+      <circle cx="65" cy="65" r={r} fill="none" stroke="#F1F5F9" strokeWidth="8" />
+      {/* Fill */}
+      <circle cx="65" cy="65" r={r} fill="none" stroke={color} strokeWidth="8"
         strokeDasharray={`${dash} ${circ}`} strokeLinecap="round"
         transform="rotate(-90 65 65)"
-        style={{ filter: `drop-shadow(0 0 8px ${color}80)`, transition: 'stroke-dasharray 0.05s linear' }}
+        style={{ transition: 'stroke-dasharray 0.05s linear', filter: `drop-shadow(0 0 6px ${color}55)` }}
       />
-      <text x="65" y="60" textAnchor="middle" fill="#0f172a" fontSize="28" fontWeight="800">{displayed}</text>
-      <text x="65" y="78" textAnchor="middle" fill="#94a3b8" fontSize="11">/100</text>
+      <text x="65" y="58" textAnchor="middle" fill="#0F172A" fontSize="30" fontWeight="700" fontFamily="Inter, system-ui, sans-serif">{displayed}</text>
+      <text x="65" y="76" textAnchor="middle" fill="#94A3B8" fontSize="11" fontFamily="Inter, system-ui, sans-serif">/100</text>
     </svg>
   );
 }
 
-/* ── Animated Bar ── */
+/* ── Animated Bar — thinner, enterprise ── */
 function AnimatedBar({ value, color, delay }: { value: number; color: string; delay: number }) {
   const [width, setWidth] = useState(0);
   useEffect(() => {
@@ -165,19 +167,24 @@ function AnimatedBar({ value, color, delay }: { value: number; color: string; de
     return () => clearTimeout(t);
   }, [value, delay]);
   return (
-    <div style={{ height: '6px', borderRadius: '999px', background: '#f1f5f9', overflow: 'hidden' }}>
-      <div style={{ height: '100%', borderRadius: '999px', background: `linear-gradient(90deg, ${color})`, width: `${width}%`, transition: 'width 1.2s cubic-bezier(0.22,1,0.36,1)' }} />
+    <div style={{ height: '4px', borderRadius: '999px', background: '#F1F5F9', overflow: 'hidden' }}>
+      <div style={{
+        height: '100%', borderRadius: '999px',
+        background: `linear-gradient(90deg, ${color})`,
+        width: `${width}%`,
+        transition: 'width 1.4s cubic-bezier(0.16,1,0.3,1)',
+      }} />
     </div>
   );
 }
 
-/* ── Live Ticker ── */
+/* ── Live Ticker — refined dark bar ── */
 const liveInsights = [
-  '⚡ تم رصد ارتفاع في فواتير الموردين بنسبة 14% هذا الأسبوع',
-  '📊 الرواتب ستستهلك 43% من السيولة في الدورة القادمة',
-  '🔔 3 فواتير متأخرة تجاوزت 30 يوم — يُنصح بالمتابعة الفورية',
-  '📈 مؤشر السيولة انخفض 6 نقاط منذ الأسبوع الماضي',
-  '💡 التمويل عبر الفواتير متاح بمعدل 2.1% — الأقل تكلفةً حالياً',
+  'ارتفاع في فواتير الموردين بنسبة 14% هذا الأسبوع',
+  'الرواتب ستستهلك 43% من السيولة في الدورة القادمة',
+  '3 فواتير متأخرة تجاوزت 30 يوم — يُنصح بالمتابعة الفورية',
+  'مؤشر السيولة انخفض 6 نقاط منذ الأسبوع الماضي',
+  'التمويل عبر الفواتير متاح بمعدل 2.1% — الأقل تكلفةً حالياً',
 ];
 
 function LiveTicker({ onSync, syncing, lastSynced }: { onSync: () => void; syncing: boolean; lastSynced: string }) {
@@ -186,35 +193,42 @@ function LiveTicker({ onSync, syncing, lastSynced }: { onSync: () => void; synci
   useEffect(() => {
     const iv = setInterval(() => {
       setVisible(false);
-      setTimeout(() => { setIndex((i) => (i + 1) % liveInsights.length); setVisible(true); }, 400);
-    }, 3500);
+      setTimeout(() => { setIndex((i) => (i + 1) % liveInsights.length); setVisible(true); }, 350);
+    }, 4000);
     return () => clearInterval(iv);
   }, []);
 
   return (
-    <div style={{ background: 'linear-gradient(135deg, #020B1E, #031430)', borderRadius: '14px', padding: '12px 18px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
-        <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#22c55e', boxShadow: '0 0 8px #22c55e', animation: 'livePulse 1.5s infinite' }} />
-        <span style={{ color: '#4ade80', fontSize: '11px', fontWeight: 700, letterSpacing: '1px' }}>LIVE</span>
+    <div style={{
+      background: '#0F172A', borderRadius: '12px', padding: '11px 20px',
+      display: 'flex', alignItems: 'center', gap: '14px',
+      border: '1px solid rgba(255,255,255,0.06)',
+    }}>
+      {/* LIVE badge */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '7px', flexShrink: 0 }}>
+        <div style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#10B981', boxShadow: '0 0 6px #10B981', animation: 'pulse 2s infinite' }} />
+        <span style={{ color: '#6EE7B7', fontSize: '10px', fontWeight: 700, letterSpacing: '1.5px' }}>LIVE</span>
       </div>
-      <span style={{ color: '#cbd5e1', fontSize: '13px', opacity: visible ? 1 : 0, transform: visible ? 'translateY(0)' : 'translateY(6px)', transition: 'opacity 0.4s, transform 0.4s', flex: 1 }}>
+      {/* Separator */}
+      <div style={{ width: '1px', height: '16px', background: 'rgba(255,255,255,0.08)', flexShrink: 0 }} />
+      {/* Insight */}
+      <span style={{
+        color: '#94A3B8', fontSize: '12.5px', flex: 1,
+        opacity: visible ? 1 : 0, transform: visible ? 'translateY(0)' : 'translateY(4px)',
+        transition: 'opacity 0.35s, transform 0.35s',
+      }}>
         {liveInsights[index]}
       </span>
-      {/* ── زر المزامنة ── */}
-      <button
-        onClick={onSync}
-        disabled={syncing}
-        style={{
-          flexShrink: 0, display: 'flex', alignItems: 'center', gap: '6px',
-          background: syncing ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.08)',
-          border: '1px solid rgba(255,255,255,0.12)', borderRadius: '10px',
-          padding: '6px 14px', color: syncing ? '#64748b' : '#e2e8f0',
-          fontSize: '12px', fontWeight: 600, cursor: syncing ? 'not-allowed' : 'pointer',
-          transition: 'all 0.2s',
-        }}
-      >
-        <RefreshCw size={12} style={{ animation: syncing ? 'spin 1s linear infinite' : 'none' }} />
-        {syncing ? 'جاري المزامنة...' : `مزامنة · ${lastSynced}`}
+      {/* Sync button */}
+      <button onClick={onSync} disabled={syncing} style={{
+        flexShrink: 0, display: 'flex', alignItems: 'center', gap: '6px',
+        background: 'transparent', border: '1px solid rgba(255,255,255,0.10)',
+        borderRadius: '8px', padding: '5px 13px',
+        color: syncing ? '#475569' : '#CBD5E1', fontSize: '12px', fontWeight: 500,
+        cursor: syncing ? 'not-allowed' : 'pointer', transition: 'all 0.2s',
+      }}>
+        <RefreshCw size={11} style={{ animation: syncing ? 'spin 1s linear infinite' : 'none' }} />
+        {syncing ? 'مزامنة...' : `مزامنة · ${lastSynced}`}
       </button>
     </div>
   );
@@ -228,227 +242,285 @@ export default function DashboardPage() {
   const [syncing, setSyncing] = useState(false);
   const [syncCount, setSyncCount] = useState(0);
 
-  // Derived state
   const status = computeLiquidityStatus(data);
   const statusCfg = statusConfig[status];
   const activeRecommendations = insightsByStatus[status];
 
-  // Animated KPI values
   const cashAnim   = useCountUp(Math.round(data.cashMillions * 10), 1600, 200);
   const riskAnim   = useCountUp(data.riskScore, 1400, 300);
   const daysAnim   = useCountUp(data.daysToAlert, 1200, 100);
   const runwayAnim = useCountUp(data.runwayDays, 1400, 400);
 
-  /* ── 3. SMART SYNC SIMULATION ── */
   const handleSync = useCallback(async () => {
     if (syncing) return;
     setSyncing(true);
     await new Promise((r) => setTimeout(r, 2200));
-    // Toggle between datasets to demo the feature
     setData((prev) => (prev.riskScore > 70 ? SYNCED_DATA : INITIAL_DATA));
     setSyncCount((c) => c + 1);
     setSyncing(false);
   }, [syncing]);
 
+  /* ── Design tokens ── */
+  const card = {
+    borderRadius: '14px', background: '#FFFFFF',
+    border: '1px solid #E2E8F0',
+    boxShadow: '0 1px 2px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.05)',
+    padding: '22px',
+  };
+
   return (
     <AuthGuard>
       <SiteShell>
-        <main style={{ minHeight: '100vh', background: '#f8fafc', padding: '32px 16px' }} dir="rtl">
-          <div style={{ maxWidth: '1280px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+        <main style={{ minHeight: '100vh', background: '#EEF2F7', padding: '28px 20px', fontFamily: "'Inter', 'Plus Jakarta Sans', system-ui, sans-serif" }} dir="rtl">
+          <div style={{ maxWidth: '1300px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '18px' }}>
 
-            {/* ── شريط LIVE + زر المزامنة ── */}
+            {/* ── LIVE ticker ── */}
             <LiveTicker onSync={handleSync} syncing={syncing} lastSynced={data.lastSynced} />
 
-            {/* ── إشعار تغيير الحالة بعد المزامنة ── */}
+            {/* ── Status notification ── */}
             {syncCount > 0 && (
               <div style={{
-                borderRadius: '14px', border: `1px solid ${statusCfg.border}`,
-                background: statusCfg.bg, padding: '12px 18px',
+                ...card, padding: '13px 18px',
                 display: 'flex', alignItems: 'center', gap: '10px',
-                animation: 'fadeSlideIn 0.4s ease',
+                borderRight: `3px solid ${statusCfg.dot}`,
+                animation: 'slideDown 0.35s ease',
               }}>
-                <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: statusCfg.dot, flexShrink: 0 }} />
-                <span style={{ fontSize: '13px', fontWeight: 600, color: statusCfg.color }}>
+                <div style={{ width: '7px', height: '7px', borderRadius: '50%', background: statusCfg.dot, flexShrink: 0 }} />
+                <span style={{ fontSize: '13px', fontWeight: 500, color: '#334155' }}>
                   {status === 'warning'
-                    ? '✅ تم تحديث البيانات — الوضع تحسّن إلى مستوى تحذير. راجع التوصيات الجديدة.'
-                    : '⚠️ البيانات الأصلية — الوضع حرج. اتخذ إجراءً فورياً.'}
+                    ? 'تم تحديث البيانات — الوضع تحسّن إلى مستوى تحذير. راجع التوصيات الجديدة.'
+                    : 'البيانات الأصلية — الوضع حرج. اتخذ إجراءً فورياً.'}
                 </span>
               </div>
             )}
 
-            {/* ── الهيدر الداكن ── */}
+            {/* ── Hero header — Midnight Navy ── */}
             <header style={{
-              position: 'relative', overflow: 'hidden', borderRadius: '24px',
-              background: 'linear-gradient(145deg, #010C1F 0%, #031430 60%, #020B1E 100%)',
-              padding: '32px', color: 'white', boxShadow: '0 8px 40px rgba(0,0,0,0.18)',
+              position: 'relative', overflow: 'hidden', borderRadius: '16px',
+              background: 'linear-gradient(135deg, #0F172A 0%, #1E293B 100%)',
+              padding: '36px 40px', color: 'white',
+              boxShadow: '0 4px 32px rgba(15,23,42,0.28)',
+              border: '1px solid rgba(255,255,255,0.04)',
             }}>
-              <div style={{ position: 'absolute', top: '-80px', left: '-80px', width: '400px', height: '400px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(30,80,200,0.18), transparent 70%)', pointerEvents: 'none' }} />
-              <div style={{ position: 'absolute', bottom: '-60px', right: '5%', width: '300px', height: '300px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(0,180,220,0.10), transparent 70%)', pointerEvents: 'none' }} />
+              {/* Subtle ambient glow — one only, low opacity */}
+              <div style={{ position: 'absolute', top: '-120px', right: '-60px', width: '360px', height: '360px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(37,99,235,0.12), transparent 70%)', pointerEvents: 'none' }} />
 
-              <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexWrap: 'wrap', gap: '24px', alignItems: 'center', justifyContent: 'space-between' }}>
-                <div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px', flexWrap: 'wrap' }}>
-                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', borderRadius: '999px', border: '1px solid rgba(91,141,238,0.3)', background: 'rgba(91,141,238,0.1)', padding: '5px 14px', color: '#7ba7f5', fontSize: '12px' }}>
-                      <Brain size={12} /> ذكاء اصطناعي · يتجدد كل 24 ساعة
-                    </div>
-                    {/* حالة السيولة الديناميكية */}
-                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', borderRadius: '999px', border: `1px solid ${statusCfg.border}`, background: statusCfg.bg, padding: '5px 14px', fontSize: '12px', fontWeight: 700, color: statusCfg.color }}>
-                      <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: statusCfg.dot, animation: status !== 'stable' ? 'livePulse 1.2s infinite' : 'none' }} />
-                      حالة السيولة: {statusCfg.label}
-                    </div>
-                  </div>
-                  <h1 style={{ fontSize: '36px', fontWeight: 900, lineHeight: 1.15, letterSpacing: '-0.5px' }}>
-                    بصيرة تساعدك على رؤية<br />
-                    <span style={{ background: 'linear-gradient(90deg, #60c8ff, #93c5fd)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-                      أزمة السيولة قبل {daysAnim} يوماً
+              <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexWrap: 'wrap', gap: '32px', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ flex: 1, minWidth: '280px' }}>
+                  {/* Pills */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '20px', flexWrap: 'wrap' }}>
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', borderRadius: '6px', background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.10)', padding: '4px 12px', color: '#94A3B8', fontSize: '11px', fontWeight: 500, letterSpacing: '0.3px' }}>
+                      <Brain size={10} /> AI · يتجدد كل 24 ساعة
                     </span>
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', borderRadius: '6px', background: statusCfg.bg, border: `1px solid ${statusCfg.border}`, padding: '4px 12px', color: statusCfg.color, fontSize: '11px', fontWeight: 600 }}>
+                      <span style={{ width: '5px', height: '5px', borderRadius: '50%', background: statusCfg.dot, display: 'inline-block', animation: status !== 'stable' ? 'pulse 2s infinite' : 'none' }} />
+                      حالة السيولة: {statusCfg.label}
+                    </span>
+                  </div>
+
+                  <h1 style={{ fontSize: '32px', fontWeight: 700, lineHeight: 1.2, letterSpacing: '-0.5px', color: '#F8FAFC' }}>
+                    رؤية أزمة السيولة<br />
+                    <span style={{ color: '#60A5FA', fontWeight: 800 }}>قبل {daysAnim} يوماً من وقوعها</span>
                   </h1>
-                  <p style={{ color: '#7d95b5', fontSize: '14px', marginTop: '12px', maxWidth: '480px', lineHeight: 1.7 }}>
+                  <p style={{ color: '#64748B', fontSize: '14px', marginTop: '14px', maxWidth: '460px', lineHeight: 1.75 }}>
                     راقب حالة النقد، افهم ما يضغط على ميزانيتك، واحصل على إجراءات واضحة قبل أن تتفاقم.
                   </p>
                 </div>
 
-                <div style={{ borderRadius: '18px', border: `1px solid ${statusCfg.border}`, background: statusCfg.bg, padding: '20px 28px', textAlign: 'center', minWidth: '160px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', color: statusCfg.color, fontSize: '11px', fontWeight: 700, marginBottom: '8px' }}>
-                    <div style={{ width: '7px', height: '7px', borderRadius: '50%', background: statusCfg.dot, animation: status !== 'stable' ? 'livePulse 1.2s infinite' : 'none' }} />
+                {/* Alert card — glassmorphism */}
+                <div style={{
+                  borderRadius: '12px', padding: '22px 28px', textAlign: 'center', minWidth: '156px',
+                  background: 'rgba(255,255,255,0.05)', backdropFilter: 'blur(12px)',
+                  border: `1px solid ${statusCfg.border}`,
+                  boxShadow: `inset 0 0 24px ${statusCfg.dot}10`,
+                }}>
+                  <p style={{ color: statusCfg.color, fontSize: '11px', fontWeight: 600, letterSpacing: '0.5px', marginBottom: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px' }}>
+                    <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: statusCfg.dot, display: 'inline-block', animation: status !== 'stable' ? 'pulse 1.8s infinite' : 'none' }} />
                     {statusCfg.label === 'حرج' ? 'تنبيه حرج' : statusCfg.label === 'تحذير' ? 'تحذير مبكر' : 'وضع مستقر'}
-                  </div>
-                  <div style={{ fontSize: '52px', fontWeight: 900, color: 'white', lineHeight: 1 }}>{daysAnim}</div>
-                  <div style={{ color: statusCfg.color, fontSize: '13px', marginTop: '6px', opacity: 0.85 }}>يوم حتى الأزمة</div>
-                  <div style={{ marginTop: '12px', height: '4px', borderRadius: '999px', background: 'rgba(255,255,255,0.08)' }}>
-                    <div style={{ height: '100%', width: `${Math.min(data.daysToAlert / 60 * 100, 100)}%`, borderRadius: '999px', background: statusCfg.dot, transition: 'width 1s ease', animation: status !== 'stable' ? 'livePulse 2s infinite' : 'none' }} />
+                  </p>
+                  <p style={{ fontSize: '56px', fontWeight: 800, color: '#F8FAFC', lineHeight: 1, letterSpacing: '-2px' }}>{daysAnim}</p>
+                  <p style={{ color: '#64748B', fontSize: '12px', marginTop: '6px' }}>يوم حتى الأزمة</p>
+                  <div style={{ marginTop: '14px', height: '3px', borderRadius: '999px', background: 'rgba(255,255,255,0.06)' }}>
+                    <div style={{ height: '100%', width: `${Math.min(data.daysToAlert / 60 * 100, 100)}%`, borderRadius: '999px', background: statusCfg.dot, transition: 'width 1.2s ease' }} />
                   </div>
                 </div>
               </div>
             </header>
 
-            {/* ── بطاقات KPI ── */}
-            <section style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', gap: '16px' }}>
+            {/* ── KPI cards ── */}
+            <section style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '14px' }}>
               {[
-                { title: 'التدفق النقدي', value: `${(cashAnim / 10).toFixed(1)}`, unit: 'مليون ر.س', badge: '+12.4%', badgeColor: '#166534', badgeBg: '#f0fdf4', borderColor: '#3b82f6', icon: <Wallet size={18} />, iconBg: '#dbeafe', iconColor: '#1d4ed8' },
-                { title: 'درجة المخاطر AI', value: `${riskAnim}`, unit: '/ 100', badge: statusCfg.label, badgeColor: statusCfg.color, badgeBg: statusCfg.bg.replace('0.08', '0.12'), borderColor: statusCfg.dot, icon: <CircleAlert size={18} />, iconBg: statusCfg.bg.replace('0.08', '0.15'), iconColor: statusCfg.color },
-                { title: 'تاريخ الأزمة', value: '20 يوليو', unit: `بعد ${daysAnim} يوم`, badge: status === 'stable' ? 'آمن' : 'قريب', badgeColor: status === 'stable' ? '#166534' : '#9a3412', badgeBg: status === 'stable' ? '#f0fdf4' : '#fff7ed', borderColor: '#f97316', icon: <Clock3 size={18} />, iconBg: '#ffedd5', iconColor: '#ea580c' },
-                { title: 'فترة التشغيل', value: `${runwayAnim}`, unit: 'يوم', badge: 'مستقر', badgeColor: '#166534', badgeBg: '#f0fdf4', borderColor: '#22c55e', icon: <BarChart3 size={18} />, iconBg: '#dcfce7', iconColor: '#16a34a' },
+                {
+                  title: 'التدفق النقدي', value: `${(cashAnim / 10).toFixed(1)}`, unit: 'مليون ر.س',
+                  badge: '+12.4%', badgeColor: '#065F46', badgeBg: '#ECFDF5',
+                  accent: '#2563EB', icon: <Wallet size={16} />, iconBg: '#EFF6FF', iconColor: '#2563EB',
+                },
+                {
+                  title: 'درجة المخاطر AI', value: `${riskAnim}`, unit: '/ 100',
+                  badge: statusCfg.label, badgeColor: statusCfg.color, badgeBg: statusCfg.bg,
+                  accent: statusCfg.dot, icon: <CircleAlert size={16} />, iconBg: statusCfg.bg, iconColor: statusCfg.color,
+                },
+                {
+                  title: 'تاريخ الأزمة', value: '20 يوليو', unit: `بعد ${daysAnim} يوم`,
+                  badge: status === 'stable' ? 'آمن' : 'قريب',
+                  badgeColor: status === 'stable' ? '#065F46' : '#92400E',
+                  badgeBg: status === 'stable' ? '#ECFDF5' : '#FFFBEB',
+                  accent: '#D97706', icon: <Clock3 size={16} />, iconBg: '#FFFBEB', iconColor: '#D97706',
+                },
+                {
+                  title: 'فترة التشغيل', value: `${runwayAnim}`, unit: 'يوم',
+                  badge: 'مستقر', badgeColor: '#065F46', badgeBg: '#ECFDF5',
+                  accent: '#10B981', icon: <BarChart3 size={16} />, iconBg: '#ECFDF5', iconColor: '#10B981',
+                },
               ].map((item) => (
-                <div key={item.title} style={{ borderRadius: '18px', background: 'white', border: '1px solid #e2e8f0', borderTop: `4px solid ${item.borderColor}`, padding: '20px', boxShadow: '0 1px 8px rgba(0,0,0,0.04)', transition: 'all 0.4s ease' }}>
+                <div key={item.title} style={{
+                  ...card,
+                  borderTop: `2px solid ${item.accent}`,
+                  transition: 'box-shadow 0.2s',
+                }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                    <div>
-                      <p style={{ fontSize: '11px', color: '#94a3b8', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>{item.title}</p>
-                      <p style={{ fontSize: '26px', fontWeight: 900, color: '#0f172a', marginTop: '8px', letterSpacing: '-0.5px' }}>{item.value}</p>
-                      <p style={{ fontSize: '11px', color: '#94a3b8', marginTop: '2px' }}>{item.unit}</p>
-                    </div>
-                    <div style={{ background: item.iconBg, color: item.iconColor, borderRadius: '12px', padding: '10px' }}>{item.icon}</div>
+                    <p style={{ fontSize: '11px', color: '#94A3B8', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.6px' }}>{item.title}</p>
+                    <div style={{ background: item.iconBg, color: item.iconColor, borderRadius: '8px', padding: '7px' }}>{item.icon}</div>
                   </div>
+                  <p style={{ fontSize: '28px', fontWeight: 700, color: '#0F172A', marginTop: '10px', letterSpacing: '-0.8px', lineHeight: 1 }}>{item.value}</p>
+                  <p style={{ fontSize: '11px', color: '#94A3B8', marginTop: '3px' }}>{item.unit}</p>
                   <div style={{ marginTop: '14px' }}>
-                    <span style={{ background: item.badgeBg, color: item.badgeColor, fontSize: '11px', fontWeight: 700, padding: '3px 10px', borderRadius: '999px' }}>{item.badge}</span>
+                    <span style={{ background: item.badgeBg, color: item.badgeColor, fontSize: '11px', fontWeight: 600, padding: '3px 9px', borderRadius: '5px' }}>{item.badge}</span>
                   </div>
                 </div>
               ))}
             </section>
 
-            {/* ── الرسم البياني + مقياس المخاطر ── */}
-            <section style={{ display: 'grid', gridTemplateColumns: '1.6fr 1fr', gap: '16px' }}>
-              <div style={{ borderRadius: '20px', background: 'white', border: '1px solid #e2e8f0', padding: '24px', boxShadow: '0 1px 8px rgba(0,0,0,0.04)' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+            {/* ── Chart + Risk Gauge ── */}
+            <section style={{ display: 'grid', gridTemplateColumns: '1.65fr 1fr', gap: '14px' }}>
+
+              {/* Chart — sleek, no gridlines */}
+              <div style={card}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '22px' }}>
                   <div>
-                    <p style={{ fontSize: '11px', color: '#94a3b8', fontWeight: 600, textTransform: 'uppercase' }}>توقعات مستقبلية</p>
-                    <h2 style={{ fontSize: '16px', fontWeight: 800, color: '#0f172a', marginTop: '4px' }}>اتجاه الرصيد النقدي · 6 أشهر</h2>
+                    <p style={{ fontSize: '10px', color: '#94A3B8', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.8px' }}>توقعات مستقبلية</p>
+                    <h2 style={{ fontSize: '15px', fontWeight: 700, color: '#0F172A', marginTop: '3px' }}>اتجاه الرصيد النقدي · 6 أشهر</h2>
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: '#eff6ff', borderRadius: '999px', padding: '5px 12px', fontSize: '11px', color: '#0A3D91', fontWeight: 700 }}>
-                    <Zap size={11} /> مباشر
-                  </div>
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', background: '#EFF6FF', borderRadius: '6px', padding: '4px 11px', fontSize: '11px', color: '#2563EB', fontWeight: 600 }}>
+                    <Zap size={10} /> مباشر
+                  </span>
                 </div>
-                <div style={{ height: '220px' }}>
+                <div style={{ height: '210px' }}>
                   <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={data.cashTrend} key={syncCount}>
+                    <AreaChart data={data.cashTrend} key={syncCount} margin={{ top: 4, right: 4, left: 0, bottom: 0 }}>
                       <defs>
-                        <linearGradient id="cashGrad" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#0A3D91" stopOpacity={0.3} />
-                          <stop offset="95%" stopColor="#0A3D91" stopOpacity={0.02} />
+                        <linearGradient id="eliteGrad" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%"   stopColor="#2563EB" stopOpacity={0.18} />
+                          <stop offset="100%" stopColor="#2563EB" stopOpacity={0} />
                         </linearGradient>
                       </defs>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                      <XAxis dataKey="month" tickLine={false} axisLine={false} tick={{ fontSize: 11, fill: '#94a3b8' }} />
-                      <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 11, fill: '#94a3b8' }} />
-                      <Tooltip contentStyle={{ borderRadius: '12px', border: '1px solid #e2e8f0', fontSize: '12px' }} />
-                      <Area type="monotone" dataKey="cash" stroke="#0A3D91" fill="url(#cashGrad)" strokeWidth={2.5} animationDuration={1500} />
+                      {/* No CartesianGrid — cleaner enterprise look */}
+                      <XAxis dataKey="month" tickLine={false} axisLine={false} tick={{ fontSize: 10, fill: '#94A3B8', fontFamily: 'Inter, system-ui' }} />
+                      <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 10, fill: '#94A3B8', fontFamily: 'Inter, system-ui' }} width={55} />
+                      <Tooltip
+                        contentStyle={{ borderRadius: '10px', border: '1px solid #E2E8F0', fontSize: '12px', boxShadow: '0 4px 16px rgba(0,0,0,0.08)', fontFamily: 'Inter, system-ui' }}
+                        cursor={{ stroke: '#E2E8F0', strokeWidth: 1 }}
+                      />
+                      <Area type="monotone" dataKey="cash" stroke="#2563EB" strokeWidth={1.8} fill="url(#eliteGrad)" dot={false} animationDuration={1600} />
                     </AreaChart>
                   </ResponsiveContainer>
                 </div>
               </div>
 
-              <div style={{ borderRadius: '20px', background: 'white', border: '1px solid #e2e8f0', padding: '24px', boxShadow: '0 1px 8px rgba(0,0,0,0.04)' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-                  <Sparkles size={15} color="#0A3D91" />
-                  <h2 style={{ fontSize: '16px', fontWeight: 800, color: '#0f172a' }}>AI Risk Score</h2>
+              {/* AI Risk Score */}
+              <div style={card}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '7px', marginBottom: '2px' }}>
+                  <Sparkles size={14} color="#2563EB" />
+                  <h2 style={{ fontSize: '15px', fontWeight: 700, color: '#0F172A' }}>AI Risk Score</h2>
                 </div>
-                <p style={{ fontSize: '11px', color: '#94a3b8', marginBottom: '16px' }}>مؤشر المخاطر بالذكاء الاصطناعي</p>
+                <p style={{ fontSize: '11px', color: '#94A3B8', marginBottom: '18px' }}>مؤشر المخاطر بالذكاء الاصطناعي</p>
                 <RiskGauge score={data.riskScore} key={`gauge-${syncCount}`} />
-                <div style={{ marginTop: '20px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <div style={{ marginTop: '22px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
                   {data.riskDrivers.map((d, i) => (
                     <div key={d.label}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
-                        <span style={{ fontSize: '12px', fontWeight: 600, color: '#475569' }}>{d.label}</span>
-                        <span style={{ fontSize: '12px', fontWeight: 800, color: '#0f172a' }}>{d.value}%</span>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
+                        <span style={{ fontSize: '12px', fontWeight: 500, color: '#475569' }}>{d.label}</span>
+                        <span style={{ fontSize: '12px', fontWeight: 700, color: '#0F172A' }}>{d.value}%</span>
                       </div>
-                      <AnimatedBar key={`bar-${syncCount}-${i}`} value={d.value} color={d.color} delay={400 + i * 150} />
+                      <AnimatedBar key={`bar-${syncCount}-${i}`} value={d.value} color={d.color} delay={500 + i * 150} />
                     </div>
                   ))}
                 </div>
               </div>
             </section>
 
-            {/* ── التوصيات الذكية + التمويل ── */}
-            <section style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-              <div style={{ borderRadius: '20px', background: 'white', border: '1px solid #e2e8f0', padding: '24px', boxShadow: '0 1px 8px rgba(0,0,0,0.04)' }}>
+            {/* ── Recommendations + Finance ── */}
+            <section style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+
+              {/* Smart Recommendations */}
+              <div style={card}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '18px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <TrendingDown size={15} color="#ef4444" />
-                    <h2 style={{ fontSize: '16px', fontWeight: 800, color: '#0f172a' }}>الإجراءات المقترحة</h2>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
+                    <TrendingDown size={14} color="#D97706" />
+                    <h2 style={{ fontSize: '15px', fontWeight: 700, color: '#0F172A' }}>الإجراءات المقترحة</h2>
                   </div>
-                  <span style={{ fontSize: '11px', fontWeight: 700, padding: '3px 10px', borderRadius: '999px', background: statusCfg.bg, color: statusCfg.color, border: `1px solid ${statusCfg.border}` }}>
+                  <span style={{ fontSize: '11px', fontWeight: 600, padding: '3px 10px', borderRadius: '5px', background: statusCfg.bg, color: statusCfg.color, border: `1px solid ${statusCfg.border}` }}>
                     {statusCfg.label}
                   </span>
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   {activeRecommendations.map((item, i) => (
-                    <div key={`${syncCount}-${i}`} style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', borderRadius: '14px', border: '1px solid #f1f5f9', background: '#f8fafc', padding: '14px', animation: 'fadeSlideIn 0.3s ease both', animationDelay: `${i * 80}ms` }}>
-                      <div style={{ flexShrink: 0, width: '26px', height: '26px', borderRadius: '8px', background: '#0A3D91', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '12px', fontWeight: 800 }}>{i + 1}</div>
-                      <p style={{ flex: 1, fontSize: '13px', color: '#334155', lineHeight: 1.6 }}>{item.text}</p>
-                      <span style={{ flexShrink: 0, background: item.urgencyBg, color: item.urgencyColor, fontSize: '11px', fontWeight: 700, padding: '3px 10px', borderRadius: '999px' }}>{item.urgency}</span>
+                    <div key={`${syncCount}-${i}`} style={{
+                      display: 'flex', alignItems: 'flex-start', gap: '11px',
+                      borderRadius: '10px', border: '1px solid #F1F5F9', background: '#FAFAFA',
+                      padding: '13px', animation: 'slideDown 0.3s ease both',
+                      animationDelay: `${i * 60}ms`,
+                    }}>
+                      <div style={{ flexShrink: 0, width: '22px', height: '22px', borderRadius: '6px', background: '#0F172A', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '11px', fontWeight: 700 }}>{i + 1}</div>
+                      <p style={{ flex: 1, fontSize: '13px', color: '#334155', lineHeight: 1.65 }}>{item.text}</p>
+                      <span style={{ flexShrink: 0, background: item.urgencyBg, color: item.urgencyColor, fontSize: '10px', fontWeight: 600, padding: '3px 9px', borderRadius: '5px', whiteSpace: 'nowrap' }}>{item.urgency}</span>
                     </div>
                   ))}
                 </div>
               </div>
 
-              <div style={{ borderRadius: '20px', background: 'white', border: '1px solid #e2e8f0', padding: '24px', boxShadow: '0 1px 8px rgba(0,0,0,0.04)' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '18px' }}>
-                  <Landmark size={15} color="#0A3D91" />
-                  <h2 style={{ fontSize: '16px', fontWeight: 800, color: '#0f172a' }}>خيارات التمويل</h2>
+              {/* Finance Options */}
+              <div style={card}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '7px', marginBottom: '18px' }}>
+                  <Landmark size={14} color="#2563EB" />
+                  <h2 style={{ fontSize: '15px', fontWeight: 700, color: '#0F172A' }}>خيارات التمويل</h2>
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   {[
                     { name: 'خط رأس المال العامل', term: '12 أسبوعاً', rate: '8.9%',  recommended: true  },
                     { name: 'قرض قصير الأجل',      term: '6 أشهر',    rate: '11.2%', recommended: false },
                     { name: 'تمويل الفواتير',       term: '3 أيام',    rate: '2.1%',  recommended: false },
-                  ].map((option) => (
-                    <div key={option.name} style={{ borderRadius: '14px', padding: '14px', border: option.recommended ? '1px solid #bfdbfe' : '1px solid #f1f5f9', background: option.recommended ? 'linear-gradient(135deg, #eff6ff, #f0f9ff)' : '#f8fafc' }}>
+                  ].map((opt) => (
+                    <div key={opt.name} style={{
+                      borderRadius: '10px', padding: '13px',
+                      border: opt.recommended ? '1px solid #BFDBFE' : '1px solid #F1F5F9',
+                      background: opt.recommended ? '#F0F7FF' : '#FAFAFA',
+                    }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                          <p style={{ fontSize: '13px', fontWeight: 700, color: '#0f172a' }}>{option.name}</p>
-                          {option.recommended && <span style={{ background: '#0A3D91', color: 'white', fontSize: '10px', fontWeight: 800, padding: '2px 8px', borderRadius: '999px' }}>الأفضل</span>}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
+                          <p style={{ fontSize: '13px', fontWeight: 600, color: '#0F172A' }}>{opt.name}</p>
+                          {opt.recommended && <span style={{ background: '#1E40AF', color: 'white', fontSize: '9px', fontWeight: 700, padding: '2px 7px', borderRadius: '4px', letterSpacing: '0.3px' }}>الأفضل</span>}
                         </div>
-                        <span style={{ fontSize: '11px', color: '#64748b', background: 'white', border: '1px solid #e2e8f0', borderRadius: '999px', padding: '2px 10px' }}>{option.term}</span>
+                        <span style={{ fontSize: '11px', color: '#64748B', background: 'white', border: '1px solid #E2E8F0', borderRadius: '5px', padding: '2px 9px' }}>{opt.term}</span>
                       </div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '8px' }}>
-                        <span style={{ fontSize: '12px', color: '#94a3b8' }}>معدل الفائدة</span>
-                        <span style={{ fontSize: '13px', fontWeight: 800, color: '#0A3D91' }}>{option.rate}</span>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '8px' }}>
+                        <span style={{ fontSize: '11px', color: '#94A3B8' }}>معدل الفائدة</span>
+                        <span style={{ fontSize: '14px', fontWeight: 700, color: '#1E40AF' }}>{opt.rate}</span>
                       </div>
                     </div>
                   ))}
                 </div>
-                <button style={{ marginTop: '14px', width: '100%', borderRadius: '14px', background: 'linear-gradient(135deg, #1a56db, #0A3D91)', padding: '13px', fontSize: '13px', fontWeight: 800, color: 'white', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', boxShadow: '0 4px 16px rgba(10,61,145,0.25)' }}>
-                  <TrendingUp size={14} /> طلب تمويل الآن <ArrowLeft size={13} />
+                {/* Electric Blue CTA */}
+                <button style={{
+                  marginTop: '14px', width: '100%', borderRadius: '10px',
+                  background: '#2563EB', padding: '12px',
+                  fontSize: '13px', fontWeight: 600, color: 'white',
+                  border: 'none', cursor: 'pointer',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '7px',
+                  boxShadow: '0 2px 12px rgba(37,99,235,0.30)',
+                  transition: 'background 0.2s',
+                }}>
+                  <TrendingUp size={13} /> طلب تمويل الآن <ArrowLeft size={12} />
                 </button>
               </div>
             </section>
@@ -457,9 +529,10 @@ export default function DashboardPage() {
         </main>
 
         <style>{`
-          @keyframes livePulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.85)} }
-          @keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
-          @keyframes fadeSlideIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+          @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+          @keyframes pulse   { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.45;transform:scale(0.8)} }
+          @keyframes spin    { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+          @keyframes slideDown { from{opacity:0;transform:translateY(-6px)} to{opacity:1;transform:translateY(0)} }
         `}</style>
       </SiteShell>
     </AuthGuard>
