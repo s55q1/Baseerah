@@ -8,11 +8,7 @@ export default function HomePage() {
   const router = useRouter();
 
   useEffect(() => {
-    if (isAuthenticated()) {
-      router.replace('/dashboard');
-    } else {
-      router.replace('/login');
-    }
+    router.replace('/dashboard');
   }, [router]);
 
   return (
