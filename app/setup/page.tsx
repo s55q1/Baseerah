@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -46,9 +46,9 @@ export default function SetupPage() {
   const finish = async () => {
     setSaving(true);
     const inputs: FinancialInputs = {
-      currentCash:          parseFloat(s2.currentCash),
-      monthlyRevenue:       parseFloat(s2.monthlyRevenue),
-      operationalExpenses:  parseFloat(s2.operationalExpenses),
+      currentCash:          parseFloat(s2.currentCash) / 1000,
+      monthlyRevenue:       parseFloat(s2.monthlyRevenue) / 1000,
+      operationalExpenses:  parseFloat(s2.operationalExpenses) / 1000,
       burnRate:             parseFloat(s2.burnRate),
       salaryTrend:          s3.salaryTrend,
       collectionDelay:      s3.collectionDelay,
@@ -163,13 +163,13 @@ export default function SetupPage() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: '18px', animation: 'slideIn 0.3s ease' }}>
                 <div>
                   <h2 style={{ fontSize: '20px', fontWeight: 800, color: '#F8FAFC', letterSpacing: '-0.3px' }}>وضعك المالي الحالي</h2>
-                  <p style={{ fontSize: '13px', color: '#475569', marginTop: '6px' }}>الأرقام بالمليون ريال سعودي — كن دقيقاً قدر الإمكان</p>
+                  <p style={{ fontSize: '13px', color: '#475569', marginTop: '6px' }}>الأرقام بالألف ريال سعودي — كن دقيقاً قدر الإمكان</p>
                 </div>
 
                 {[
-                  { label: 'الرصيد النقدي الحالي (مليون ر.س)', key: 'currentCash',         placeholder: 'مثال: 8.5' },
-                  { label: 'الإيراد الشهري (مليون ر.س)',        key: 'monthlyRevenue',      placeholder: 'مثال: 3.2' },
-                  { label: 'المصروفات الثابتة الشهرية (مليون ر.س)', key: 'operationalExpenses', placeholder: 'مثال: 1.8' },
+                  { label: 'الرصيد النقدي الحالي (ألف ر.س)', key: 'currentCash',         placeholder: 'مثال: 850' },
+                  { label: 'الإيراد الشهري (ألف ر.س)',        key: 'monthlyRevenue',      placeholder: 'مثال: 320' },
+                  { label: 'المصروفات الثابتة الشهرية (ألف ر.س)', key: 'operationalExpenses', placeholder: 'مثال: 180' },
                 ].map(f => (
                   <div key={f.key} style={fieldStyle}>
                     <label style={labelStyle}>{f.label}</label>
@@ -316,3 +316,4 @@ export default function SetupPage() {
     </div>
   );
 }
+
