@@ -13,6 +13,7 @@ import { SiteShell } from '@/components/site-shell';
 import { AuthGuard } from '@/components/auth-guard';
 import { Onboarding } from '@/components/onboarding';
 import { CrisisAlert } from '@/components/crisis-alert';
+import { AiChat } from '@/components/ai-chat';
 import { loadCompany, saveCompany, type FinancialInputs as StoredInputs } from '@/lib/company-store';
 
 /* ════════════════════════════════════════════════════════════════
@@ -1000,6 +1001,7 @@ export default function DashboardPage() {
           @keyframes slideDown{ from{opacity:0;transform:translateY(-6px)} to{opacity:1;transform:translateY(0)} }
         `}</style>
       </SiteShell>
+      <AiChat />
     </AuthGuard>
   );
 }

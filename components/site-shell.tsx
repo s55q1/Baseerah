@@ -42,7 +42,7 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
         }}>
           {/* شعار */}
           <Link href={authed ? '/dashboard' : '/login'} style={{ display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none' }}>
-            <img src="/mascot.png" alt="بصيرة" style={{ width: '36px', height: '36px', objectFit: 'contain' }} />
+            <span style={{ fontSize: '22px', lineHeight: 1 }}>👁️</span>
             <div>
               <p style={{ fontSize: '16px', fontWeight: 800, color: '#0f172a', lineHeight: 1 }}>بصيرة</p>
               <p style={{ fontSize: '10px', color: '#64748b', marginTop: '2px' }}>ذكاء السيولة</p>

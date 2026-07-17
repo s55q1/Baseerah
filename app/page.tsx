@@ -33,7 +33,7 @@ export default function LandingPage() {
       {/* ── Navbar ── */}
       <header style={{ position: 'sticky', top: 0, zIndex: 50, background: 'rgba(15,23,42,0.85)', backdropFilter: 'blur(16px)', borderBottom: '1px solid rgba(255,255,255,0.06)', padding: '0 32px', height: '64px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <img src="/mascot.png" alt="بصيرة" style={{ width: '34px', height: '34px', objectFit: 'contain' }} />
+          
           <div>
             <p style={{ fontSize: '16px', fontWeight: 800, color: '#F8FAFC', lineHeight: 1 }}>بصيرة</p>
             <p style={{ fontSize: '10px', color: '#475569', marginTop: '1px' }}>ذكاء السيولة</p>
@@ -262,7 +262,7 @@ export default function LandingPage() {
       {/* ── Footer ── */}
       <footer style={{ borderTop: '1px solid rgba(255,255,255,0.06)', padding: '24px 32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <img src="/mascot.png" alt="بصيرة" style={{ width: '24px', height: '24px', objectFit: 'contain', opacity: 0.7 }} />
+          <span style={{ fontSize: '16px' }}>👁️</span>
           <span style={{ fontSize: '12px', color: '#334155', fontWeight: 500 }}>بصيرة © 2026 · هاكاثون امد · مصرف الإنماء × طويق</span>
         </div>
         <div style={{ display: 'flex', gap: '20px' }}>

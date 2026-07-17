@@ -65,7 +65,7 @@ export default function LoginPage() {
 
         {/* شعار */}
         <div className="relative z-10 flex items-center gap-3">
-          <img src="/mascot.png" alt="بصيرة" style={{ width: '48px', height: '48px', objectFit: 'contain' }} />
+          
           <div>
             <p style={{ color: '#fff', fontSize: '22px', fontWeight: 800, letterSpacing: '-0.3px' }}>بصيرة</p>
             <p style={{ color: '#5b8dee', fontSize: '11px', marginTop: '1px' }}>ذكاء السيولة للأعمال</p>
@@ -148,7 +148,7 @@ export default function LoginPage() {
 
           {/* شعار للجوال */}
           <div className="lg:hidden mb-8 flex items-center gap-3">
-            <img src="/mascot.png" alt="بصيرة" style={{ width: '40px', height: '40px', objectFit: 'contain' }} />
+            
             <p style={{ fontSize: '20px', fontWeight: 800, color: '#0f172a' }}>بصيرة</p>
           </div>
 
